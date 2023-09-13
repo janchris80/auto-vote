@@ -16,10 +16,11 @@
 
 */
 import React, { Component } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, NavLink } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
 
 import routes from "routes.js";
+import { Link } from 'react-router-dom/cjs/react-router-dom.min';
 
 function Header() {
   const location = useLocation();
@@ -28,7 +29,7 @@ function Header() {
     document.documentElement.classList.toggle("nav-open");
     var node = document.createElement("div");
     node.id = "bodyClick";
-    node.onclick = function () {
+    node.onClick = function () {
       this.parentElement.removeChild(this);
       document.documentElement.classList.toggle("nav-open");
     };
@@ -59,7 +60,8 @@ function Header() {
             onClick={(e) => e.preventDefault()}
             className="mr-2"
           >
-            {getBrandText()}
+            {/* {getBrandText()} */}
+            HiveVote
           </Navbar.Brand>
         </div>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="mr-2">
@@ -71,13 +73,11 @@ function Header() {
           <Nav className="nav mr-auto" navbar>
             <Nav.Item>
               <Nav.Link
-                data-toggle="dropdown"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
                 className="m-0"
+                href='/admin/faq'
+                onClick={(e) => e.preventDefault()}
               >
-                <i className="nc-icon nc-palette"></i>
-                <span className="d-lg-none ml-1">Dashboard</span>
+                FAQ
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
@@ -86,20 +86,11 @@ function Header() {
                 href="#pablo"
                 onClick={(e) => e.preventDefault()}
               >
-                <span className="d-lg-block">FAQ</span>
+                <span className="d-lg-block">Donations</span>
               </Nav.Link>
             </Nav.Item>
           </Nav>
           <Nav className="ml-auto" navbar>
-            <Nav.Item>
-              <Nav.Link
-                className="m-0"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
-                <span className="no-icon">Account</span>
-              </Nav.Link>
-            </Nav.Item>
             <Dropdown as={Nav.Item}>
               <Dropdown.Toggle
                 aria-expanded={false}
@@ -110,7 +101,7 @@ function Header() {
                 variant="default"
                 className="m-0"
               >
-                <span className="no-icon">Dropdown</span>
+                <span className="no-icon">Support</span>
               </Dropdown.Toggle>
 
               <Dropdown.Menu aria-labelledby="navbarDropdownMenuLink">

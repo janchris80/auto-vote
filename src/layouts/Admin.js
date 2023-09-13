@@ -29,8 +29,8 @@ import sidebarImage from "assets/img/sidebar-3.jpg";
 
 function Admin() {
   const [image, setImage] = React.useState(sidebarImage);
-  const [color, setColor] = React.useState("black");
-  const [hasImage, setHasImage] = React.useState(true);
+  const [color, setColor] = React.useState("red");
+  const [hasImage, setHasImage] = React.useState(false);
   const location = useLocation();
   const mainPanel = React.useRef(null);
   const getRoutes = (routes) => {
@@ -43,9 +43,8 @@ function Admin() {
             key={key}
           />
         );
-      } else {
-        return null;
       }
+      return null;
     });
   };
   React.useEffect(() => {
@@ -68,19 +67,24 @@ function Admin() {
         <div className="main-panel" ref={mainPanel}>
           <AdminNavbar />
           <div className="content">
-            <Switch>{getRoutes(routes)}</Switch>
+            <Switch>
+              {getRoutes(routes)}
+              <Route ></Route>
+            </Switch>
           </div>
           <Footer />
         </div>
       </div>
-      <FixedPlugin
+
+      {/* TODO: this is the settings for the whole page */}
+      {/* <FixedPlugin
         hasImage={hasImage}
         setHasImage={() => setHasImage(!hasImage)}
         color={color}
         setColor={(color) => setColor(color)}
         image={image}
         setImage={(image) => setImage(image)}
-      />
+      /> */}
     </>
   );
 }
