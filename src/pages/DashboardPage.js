@@ -1,5 +1,5 @@
-import React from "react";
-import ChartistGraph from "react-chartist";
+import AutoVote from 'hooks/AutoVote';
+import { useEffect } from "react";
 // react-bootstrap components
 import {
   Badge,
@@ -15,13 +15,26 @@ import {
   OverlayTrigger,
   Tooltip,
 } from "react-bootstrap";
-import Watcher from 'hooks/Watcher'; // TODO: this import is need to comment to remove the bug
 
-function Dashboard() {
 
-  const goAuthSc = () => {
-    console.log('test');
-  }
+export default function DashboardPage() {
+
+  useEffect(() => {
+    const handleLogin = async () => {
+      console.log('login in ');
+    }
+
+    const loginButtons = document.querySelectorAll(".login-button");
+    loginButtons.forEach((button) => {
+      button.addEventListener("click", handleLogin);
+    });
+
+    return () => {
+      loginButtons.forEach((button) => {
+        button.removeEventListener("click", handleLogin);
+      });
+    };
+  }, []);
 
   return (
     <>
@@ -37,7 +50,7 @@ function Dashboard() {
                 <h3>Welcome iamjc93,</h3>
               </Card.Header>
               <Card.Body className='mb-3'>
-                <a className="btn btn-button" href="#" onClick={() => goAuthSc()}>Hive Keychain (recommended)</a>
+                <a className="btn btn-button login-button" disabled href="#">Hive Keychain (recommended)</a>
               </Card.Body>
               <Card.Footer>
               </Card.Footer>
@@ -47,7 +60,7 @@ function Dashboard() {
 
         <Row>
           <Col>
-            <Watcher />
+            <AutoVote />
           </Col>
         </Row>
       </Container>
@@ -55,4 +68,4 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+

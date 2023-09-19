@@ -1,28 +1,9 @@
-/*!
-
-=========================================================
-* Light Bootstrap Dashboard React - v2.0.1
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/light-bootstrap-dashboard-react
-* Copyright 2022 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/light-bootstrap-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import React, { Component } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
+import sidebarRoutes from 'routes/sidebarRoutes';
 
-import logo from "assets/img/reactlogo.png";
-
-function Sidebar({ color, image, routes }) {
+export default function Sidebar({ color, image }) {
   const location = useLocation();
   const activeRoute = (routeName) => {
     return location.pathname.indexOf(routeName) > -1 ? "active" : "";
@@ -37,38 +18,36 @@ function Sidebar({ color, image, routes }) {
       />
       <div className="sidebar-wrapper">
         <div className="logo">
-          <a className="simple-text" href="http://www.creative-tim.com">
+          <NavLink
+            to='/'
+            className="simple-text"
+            activeClassName="active"
+          >
             HiveVote
-          </a>
+          </NavLink>
         </div>
         <Nav>
-          {routes.map((prop, key) => {
-            if (!prop.redirect)
-              return (
-                <li
-                  className={
-                    prop.upgrade
-                      ? "active active-pro"
-                      : activeRoute(prop.layout + prop.path)
-                  }
-                  key={key}
-                >
-                  <NavLink
-                    to={prop.layout + prop.path}
-                    className="nav-link"
-                    activeClassName="active"
-                  >
-                    <i className={prop.icon} />
-                    <p>{prop.name}</p>
-                  </NavLink>
-                </li>
-              );
-            return null;
+          {sidebarRoutes.map((prop, index) => {
+            return <li
+              className={
+                prop.upgrade
+                  ? "active active-pro"
+                  : activeRoute(prop.path)
+              }
+              key={index}
+            >
+              <NavLink
+                to={prop.path}
+                className="nav-link"
+                activeClassName="active"
+              >
+                <i className={prop.icon} />
+                <p>{prop.name}</p>
+              </NavLink>
+            </li>
           })}
         </Nav>
       </div>
     </div>
   );
 }
-
-export default Sidebar;

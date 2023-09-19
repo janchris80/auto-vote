@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import hive from '@hiveio/hive-js';
 
-const Watcher = () => {
+const AutoVote = () => {
   const [lastProcessedTxId, setLastProcessedTxId] = useState(-1);
 
   const watcherAccount = 'dbuzz'; // Account to watch votes from
@@ -35,9 +35,10 @@ const Watcher = () => {
 
           const hasVoted = votes.some((v) => v.voter === voterAccount);
           if (!hasVoted) {
-            votePost(postAuthor, postPermlink, weight);
+            await votePost(postAuthor, postPermlink, weight);
           }
         }
+        console.log(result);
       } catch (err) {
         console.error('Error fetching account history:', err);
       }
@@ -46,13 +47,13 @@ const Watcher = () => {
     // Function to vote for a post
     const votePost = async (author, permlink, weight) => {
       try {
-        const result = await hive.broadcast.voteAsync(
-          voterPrivateKey,
-          voterAccount,
-          author,
-          permlink,
-          weight
-        );
+        // const result = await hive.broadcast.voteAsync(
+        //   voterPrivateKey,
+        //   voterAccount,
+        //   author,
+        //   permlink,
+        //   weight
+        // );
 
         console.log(
           `Successfully voted for post by ${author} with permlink ${permlink} and weight ${weight}`
@@ -61,6 +62,8 @@ const Watcher = () => {
         console.error('Error voting:', err);
       }
     };
+
+
 
     // Start watching for votes
     watchAccount();
@@ -75,4 +78,4 @@ const Watcher = () => {
   return <div>Watching for votes...</div>;
 };
 
-export default Watcher;
+export default AutoVote;
