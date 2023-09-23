@@ -1,13 +1,14 @@
 import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
-import sidebarRoutes from 'routes/sidebarRoutes';
+import { protectedRoute, notProtectedRoute } from '../../routes.js';
+import { useAuth } from 'hooks/AuthContext';
+import Link from './Link';
 
 export default function Sidebar({ color, image }) {
-  const location = useLocation();
-  const activeRoute = (routeName) => {
-    return location.pathname.indexOf(routeName) > -1 ? "active" : "";
-  };
+
+  const { isLoggedIn } = useAuth();
+
   return (
     <div className="sidebar" data-image={image} data-color={color}>
       <div
@@ -27,25 +28,11 @@ export default function Sidebar({ color, image }) {
           </NavLink>
         </div>
         <Nav>
-          {sidebarRoutes.map((prop, index) => {
-            return <li
-              className={
-                prop.upgrade
-                  ? "active active-pro"
-                  : activeRoute(prop.path)
-              }
-              key={index}
-            >
-              <NavLink
-                to={prop.path}
-                className="nav-link"
-                activeClassName="active"
-              >
-                <i className={prop.icon} />
-                <p>{prop.name}</p>
-              </NavLink>
-            </li>
-          })}
+          {
+            isLoggedIn
+              ? protectedRoute.map((prop, index) => <Link {...prop} key={index} />)
+              : notProtectedRoute.map((prop, index) => <Link {...prop} key={index} />)
+          }
         </Nav>
       </div>
     </div>

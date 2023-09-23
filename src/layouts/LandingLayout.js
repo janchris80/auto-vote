@@ -4,10 +4,10 @@ import '../assets/scss/font-awesome.scss';
 import discordLogo from '../assets/css/templates/steemauto-design-02/i/discord-logo.png'
 import videoThumb from '../assets/css/templates/steemauto-design-02/i/sa-video-thumb.png'
 import { NavLink } from "react-router-dom";
+import BodyStyle from './BodyStyle';
 
 
 export default function LandingLayout() {
-
 
   useEffect(() => {
     const handleLogin = () => { console.log('login in'); }
@@ -27,6 +27,7 @@ export default function LandingLayout() {
 
   return (
     <>
+      <BodyStyle className="background-image" />
       <div className="head group">
         <div className="max">
           <div className="half branding">

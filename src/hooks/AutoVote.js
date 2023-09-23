@@ -32,6 +32,7 @@ const AutoVote = () => {
 
           // Check if our voter account has already voted on this post
           const votes = await hive.api.getActiveVotesAsync(postAuthor, postPermlink);
+          console.log('votes', votes);
 
           const hasVoted = votes.some((v) => v.voter === voterAccount);
           if (!hasVoted) {
@@ -47,6 +48,7 @@ const AutoVote = () => {
     // Function to vote for a post
     const votePost = async (author, permlink, weight) => {
       try {
+        // TODO: uncomment to activate the voting.
         // const result = await hive.broadcast.voteAsync(
         //   voterPrivateKey,
         //   voterAccount,
@@ -69,7 +71,7 @@ const AutoVote = () => {
     watchAccount();
 
     // Run watchAccount every 10 seconds
-    const intervalId = setInterval(watchAccount, 10000);
+    const intervalId = setInterval(watchAccount, 20000);
 
     // Cleanup the interval on unmount
     return () => clearInterval(intervalId);

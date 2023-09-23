@@ -7,7 +7,6 @@ import Footer from "components/Footer/Footer";
 import Sidebar from "components/Sidebar/Sidebar";
 
 import sidebarImage from "assets/img/sidebar-3.jpg";
-import { useAuth } from 'hooks/AuthContext';
 import PrivateRoute from 'hooks/PrivateRoute';
 import FaqPage from 'pages/FaqPage';
 import DashboardPage from 'pages/DashboardPage';
@@ -20,6 +19,8 @@ import UpvoteCommentPage from 'pages/UpvoteCommentPage';
 import ClaimRewardPage from 'pages/ClaimRewardPage';
 import NotificationPage from 'pages/NotificationPage';
 import DonationPage from 'pages/DonationPage';
+import LoginPage from 'pages/LoginPage';
+import BodyStyle from './BodyStyle';
 
 export default function AdminLayout() {
   const [image, setImage] = useState(sidebarImage);
@@ -44,12 +45,14 @@ export default function AdminLayout() {
 
   return (
     <>
+      <BodyStyle className="no-background-image" />
       <div className="wrapper">
         <Sidebar color={color} image={hasImage ? image : ""} />
         <div className="main-panel" ref={mainPanel}>
           <AdminNavbar />
           <div className="content">
             <Switch>
+              <Route path="/login" exact component={LoginPage} />
               <PrivateRoute path="/home" component={HomePage} />
               <PrivateRoute path="/dashboard" component={DashboardPage} />
               <Route path="/faq" component={FaqPage} />

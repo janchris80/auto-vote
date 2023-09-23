@@ -14,7 +14,6 @@ import { AuthProvider } from 'hooks/AuthContext';
 
 import AdminLayout from "layouts/AdminLayout.js";
 import LandingLayout from "layouts/LandingLayout.js";
-import LoginPage from 'pages/LoginPage';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
@@ -23,7 +22,6 @@ root.render(
     <BrowserRouter>
       <Switch>
         <Route path="/" exact render={(props) => <LandingLayout {...props} />} />
-        <Route path="/login" exact render={(props) => <LoginPage {...props} />} />
         <AdminLayout />
       </Switch>
     </BrowserRouter>
