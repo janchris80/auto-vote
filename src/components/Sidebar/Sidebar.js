@@ -5,26 +5,20 @@ import { protectedRoute, notProtectedRoute } from '../../routes.js';
 import { useAuth } from 'hooks/AuthContext';
 import Link from './Link';
 
-export default function Sidebar({ color, image }) {
+export default function Sidebar() {
 
   const { isLoggedIn } = useAuth();
 
   return (
-    <div className="sidebar" data-image={image} data-color={color}>
-      <div
-        className="sidebar-background"
-        style={{
-          backgroundImage: "url(" + image + ")"
-        }}
-      />
-      <div className="sidebar-wrapper">
+    <div className="sidebar" >
+      <div className="sidebar-wrapper bg-white">
         <div className="logo">
           <NavLink
             to='/'
-            className="simple-text"
+            className="simple-text font-weight-bold text-black"
             activeClassName="active"
           >
-            HiveVote
+            <i className='text-red'>Hive</i>Vote
           </NavLink>
         </div>
         <Nav>

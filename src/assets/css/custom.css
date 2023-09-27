@@ -1,0 +1,25 @@
+
+.text-red {
+  color: #e61c34 !important;
+}
+
+.text-black {
+  color: black !important;
+}
+
+.bg-gray-1 {
+  background-color: #e6ecf0 !important;
+}
+
+.bg-gray-2 {
+  background-color: #f5f8fa !important;
+}
+
+.bg-white {
+  background-color: white !important;
+}
+
+.main-context {
+  border-right: 1px solid #e6ecf0 !important;
+  border-left: 1px solid #e6ecf0 !important;
+}

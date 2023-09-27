@@ -42,10 +42,10 @@ function Header() {
           <Navbar.Brand
             href="#"
             onClick={(e) => e.preventDefault()}
-            className="mr-2"
+            className="mr-2 font-weight-bold text-black"
           >
             {/* {getBrandText()} */}
-            HiveVote
+            <i className='text-red'>Hive</i>Vote
           </Navbar.Brand>
         </div>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="mr-2">

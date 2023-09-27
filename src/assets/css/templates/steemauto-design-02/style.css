@@ -138,8 +138,8 @@ mark {
   font-weight: 400;
   font-size: 1em;
   line-height: 1.414;
-  background-color: #2560b0;
-  background-image: url('i/sa-bg.png');
+  background-color: white;
+  /* background-image: url('i/sa-bg.png'); */
   background-position: center top;
   background-repeat: repeat-x;
 }

@@ -16,7 +16,7 @@ export default function Link({ path, icon, name, upgrade }) {
   >
     <NavLink
       to={path}
-      className="nav-link"
+      className="nav-link text-black font-weight-light"
       activeClassName="active"
     >
       <i className={icon} />

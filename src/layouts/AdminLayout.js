@@ -23,9 +23,6 @@ import LoginPage from 'pages/LoginPage';
 import BodyStyle from './BodyStyle';
 
 export default function AdminLayout() {
-  const [image, setImage] = useState(sidebarImage);
-  const [color, setColor] = useState("red");
-  const [hasImage, setHasImage] = useState(false);
   const location = useLocation();
   const mainPanel = useRef(null);
 
@@ -47,10 +44,10 @@ export default function AdminLayout() {
     <>
       <BodyStyle className="no-background-image" />
       <div className="wrapper">
-        <Sidebar color={color} image={hasImage ? image : ""} />
-        <div className="main-panel" ref={mainPanel}>
+        <Sidebar />
+        <div className="main-panel main-context" ref={mainPanel}>
           <AdminNavbar />
-          <div className="content">
+          <div className="content bg-white">
             <Switch>
               <Route path="/login" exact component={LoginPage} />
               <PrivateRoute path="/home" component={HomePage} />

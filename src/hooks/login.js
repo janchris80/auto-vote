@@ -21,6 +21,8 @@ export const requestHiveLogin = async (username) => {
     }
 
     const response = await signBufferWithKeychain(username);
+    const qwe = await getAccountDetails();
+    console.log();
     await authenticateWithServer(username, response.result);
   } catch (error) {
     throw new Error(error.message);
@@ -39,7 +41,32 @@ const signBufferWithKeychain = async (username) => {
       JSON.stringify(proof_payload),
       POSTING_AUTHORITY,
       (response) => {
-        // console.log('response', response);
+        console.log('response', response);
+        if (response.success) {
+          resolve(response);
+        } else {
+          reject(new Error('Keychain sign request failed'));
+        }
+      },
+      null,
+      LOGIN_REASON
+    );
+  });
+};
+
+const getAccountDetails = async () => {
+  return new Promise((resolve, reject) => {
+    const proof_payload = {
+      account: 'iamjc93',
+      reason: LOGIN_REASON,
+    };
+    const keychain = window.hive_keychain;
+    keychain.condenser_api.lookup_account_names(
+      username,
+      JSON.stringify(proof_payload),
+      POSTING_AUTHORITY,
+      (response) => {
+        console.log('response', response);
         if (response.success) {
           resolve(response);
         } else {
@@ -68,7 +95,7 @@ const authenticateWithServer = async (username, result) => {
   try {
     const axiosInstance = createAxiosInstance();
     const response = await axiosInstance.post('/authenticate', data);
-    // console.log('_response', response);
+    console.log('_response', response);
     return response;
   } catch (error) {
     throw new Error(error.message);

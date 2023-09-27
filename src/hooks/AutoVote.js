@@ -71,7 +71,7 @@ const AutoVote = () => {
     watchAccount();
 
     // Run watchAccount every 10 seconds
-    const intervalId = setInterval(watchAccount, 20000);
+    const intervalId = setInterval(watchAccount, 10000);
 
     // Cleanup the interval on unmount
     return () => clearInterval(intervalId);
