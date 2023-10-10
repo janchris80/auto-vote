@@ -1,4 +1,6 @@
 import axios from 'axios';
+import { storeTokenInLocalStorage } from 'lib/api';
+import { KeychainSDK } from "keychain-sdk";
 
 const BASE_URL = 'http://localhost:5000'; // Define your API base URL here
 const POSTING_AUTHORITY = 'Posting';
@@ -15,89 +17,51 @@ const createAxiosInstance = () => {
 
 export const requestHiveLogin = async (username) => {
   try {
-    const keychain = window.hive_keychain;
+    const keychain = new KeychainSDK(window);
     if (!keychain) {
       throw new Error('Hive Keychain not found');
     }
 
-    const response = await signBufferWithKeychain(username);
-    const qwe = await getAccountDetails();
-    console.log();
-    await authenticateWithServer(username, response.result);
+    const response = await keychain.signBuffer({
+      username: username,
+      message: LOGIN_REASON,
+      method: POSTING_AUTHORITY,
+      title: "Hive Auto Vote Login"
+    });
+
+    await authenticateWithServer(username, response);
   } catch (error) {
     throw new Error(error.message);
   }
 };
 
-const signBufferWithKeychain = async (username) => {
-  return new Promise((resolve, reject) => {
-    const proof_payload = {
-      account: username,
-      reason: LOGIN_REASON,
-    };
-    const keychain = window.hive_keychain;
-    keychain.requestSignBuffer(
-      username,
-      JSON.stringify(proof_payload),
-      POSTING_AUTHORITY,
-      (response) => {
-        console.log('response', response);
-        if (response.success) {
-          resolve(response);
-        } else {
-          reject(new Error('Keychain sign request failed'));
-        }
-      },
-      null,
-      LOGIN_REASON
-    );
-  });
-};
-
-const getAccountDetails = async () => {
-  return new Promise((resolve, reject) => {
-    const proof_payload = {
-      account: 'iamjc93',
-      reason: LOGIN_REASON,
-    };
-    const keychain = window.hive_keychain;
-    keychain.condenser_api.lookup_account_names(
-      username,
-      JSON.stringify(proof_payload),
-      POSTING_AUTHORITY,
-      (response) => {
-        console.log('response', response);
-        if (response.success) {
-          resolve(response);
-        } else {
-          reject(new Error('Keychain sign request failed'));
-        }
-      },
-      null,
-      LOGIN_REASON
-    );
-  });
-};
 
 const authenticateWithServer = async (username, result) => {
-  const proof_payload = {
-    account: username,
-  };
-
   const data = {
     username: username,
     network: 'hive',
     authority_type: POSTING_AUTHORITY,
-    proof_payload: JSON.stringify(proof_payload),
     proof: result,
   };
 
   try {
     const axiosInstance = createAxiosInstance();
-    const response = await axiosInstance.post('/authenticate', data);
-    console.log('_response', response);
+    const response = await axiosInstance.post('/auth/signin', data);
+    console.log('authenticateWithServer_response', response);
+    storeTokenInLocalStorage(response.data.token);
     return response;
   } catch (error) {
     throw new Error(error.message);
   }
 };
+
+export const authMe = async () => {
+  try {
+    const axiosInstance = createAxiosInstance();
+    const response = await axiosInstance.get('/auth/me');
+    console.log('authMe_response', response);
+    return response;
+  } catch (error) {
+    throw new Error(error.message);
+  }
+}

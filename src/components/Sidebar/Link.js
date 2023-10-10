@@ -1,4 +1,3 @@
-import { useAuth } from 'hooks/AuthContext';
 import { useLocation, NavLink } from 'react-router-dom';
 
 export default function Link({ path, icon, name, upgrade }) {
@@ -17,7 +16,6 @@ export default function Link({ path, icon, name, upgrade }) {
     <NavLink
       to={path}
       className="nav-link text-black font-weight-light"
-      activeClassName="active"
     >
       <i className={icon} />
       <p>{name}</p>

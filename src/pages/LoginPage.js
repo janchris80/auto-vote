@@ -1,25 +1,27 @@
 // Your React component file
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Col, Form, Row, Button, InputGroup } from 'react-bootstrap';
 import { requestHiveLogin } from 'hooks/login.js';
-import { useHistory } from 'react-router-dom';
-import { useAuth } from '../hooks/AuthContext.js';
+import { useNavigate } from 'react-router-dom';
+import useAuth from 'hooks/useAuth';
 
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [validated, setValidated] = useState(false);
-
-  const history = useHistory();
-  const { login, isLoggedIn } = useAuth();
-
+  const from = location.state?.from?.pathname || "/dashboard"
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   const handleLogin = async (event) => {
     try {
-      await requestHiveLogin(username)
-      await login();
+      await requestHiveLogin(username);
 
-      await history.push('/dashboard')
+      // if (isAuthenticated) {
+      //   await navigate('/dashboard', { replace: true });
+      // } else {
+      //   await navigate('/login', { replace: true });
+      // }
     } catch (error) {
       console.error(error)
     }
@@ -41,12 +43,6 @@ export default function LoginPage() {
   const handleUsername = (event) => {
     setUsername(event.target.value)
   }
-
-  useEffect(() => {
-    if (isLoggedIn) {
-      history.push('/dashboard')
-    }
-  }, [])
 
   return (
     <>
