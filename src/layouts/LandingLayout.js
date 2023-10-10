@@ -44,7 +44,6 @@ export default function LandingLayout() {
                 <NavLink
                   to='/faq'
                   className="nav-link"
-                  activeClassName="active"
                 >
                   FAQ
                 </NavLink>

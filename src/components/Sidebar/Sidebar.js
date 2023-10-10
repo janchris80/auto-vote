@@ -1,13 +1,13 @@
-import { useLocation, NavLink } from "react-router-dom";
-
+import { NavLink } from "react-router-dom";
 import { Nav } from "react-bootstrap";
-import { protectedRoute, notProtectedRoute } from '../../routes.js';
-import { useAuth } from 'hooks/AuthContext';
+import { routes } from '../../routes.js';
 import Link from './Link';
+import useAuth from 'hooks/useAuth.js';
 
 export default function Sidebar() {
 
-  const { isLoggedIn } = useAuth();
+  const { isAuthenticated } = useAuth();
+
 
   return (
     <div className="sidebar" >
@@ -16,16 +16,18 @@ export default function Sidebar() {
           <NavLink
             to='/'
             className="simple-text font-weight-bold text-black"
-            activeClassName="active"
           >
             <i className='text-red'>Hive</i>Vote
           </NavLink>
         </div>
         <Nav>
-          {
+          {/* {
             isLoggedIn
               ? protectedRoute.map((prop, index) => <Link {...prop} key={index} />)
               : notProtectedRoute.map((prop, index) => <Link {...prop} key={index} />)
+          } */}
+          {
+            routes.map((prop, index) => <Link {...prop} key={index} />)
           }
         </Nav>
       </div>

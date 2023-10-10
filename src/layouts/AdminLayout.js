@@ -1,13 +1,10 @@
 
-import { useEffect, useRef, useState } from "react";
-import { useLocation, Route, Switch } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import { useLocation, Route, Routes } from "react-router-dom";
 
 import AdminNavbar from "components/Navbars/AdminNavbar";
 import Footer from "components/Footer/Footer";
 import Sidebar from "components/Sidebar/Sidebar";
-
-import sidebarImage from "assets/img/sidebar-3.jpg";
-import PrivateRoute from 'hooks/PrivateRoute';
 import FaqPage from 'pages/FaqPage';
 import DashboardPage from 'pages/DashboardPage';
 import HomePage from 'pages/HomePage';
@@ -21,6 +18,8 @@ import NotificationPage from 'pages/NotificationPage';
 import DonationPage from 'pages/DonationPage';
 import LoginPage from 'pages/LoginPage';
 import BodyStyle from './BodyStyle';
+import { AuthProvider } from 'context/AuthProvider';
+import Auth from 'pages/Auth';
 
 export default function AdminLayout() {
   const location = useLocation();
@@ -41,31 +40,36 @@ export default function AdminLayout() {
   }, [location]);
 
   return (
-    <>
+    <AuthProvider>
       <BodyStyle className="no-background-image" />
       <div className="wrapper">
         <Sidebar />
         <div className="main-panel main-context" ref={mainPanel}>
           <AdminNavbar />
           <div className="content bg-white">
-            <Switch>
-              <Route path="/login" exact component={LoginPage} />
-              <PrivateRoute path="/home" component={HomePage} />
-              <PrivateRoute path="/dashboard" component={DashboardPage} />
-              <Route path="/faq" component={FaqPage} />
-              <Route path="/donation" component={DonationPage} />
-              <PrivateRoute path="/fanbase" component={FanbasePage} />
-              <PrivateRoute path="/curation-trail" component={CurationTrailPage} />
-              <PrivateRoute path="/downvote-trail" component={DownvoteTrailPage} />
-              <PrivateRoute path="/schedule-posts" component={SchedulePostPage} />
-              <PrivateRoute path="/upvote-comments" component={UpvoteCommentPage} />
-              <PrivateRoute path="/claim-rewards" component={ClaimRewardPage} />
-              <PrivateRoute path="/notifications" component={NotificationPage} />
-            </Switch>
+            <Routes>
+
+              <Route element={<Auth allowedRoles={['user']} />}>
+                <Route path="/home" element={<HomePage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/fanbase" element={<FanbasePage />} />
+                <Route path="/curation-trail" element={<CurationTrailPage />} />
+                <Route path="/downvote-trail" element={<DownvoteTrailPage />} />
+                <Route path="/schedule-posts" element={<SchedulePostPage />} />
+                <Route path="/upvote-comments" element={<UpvoteCommentPage />} />
+                <Route path="/claim-rewards" element={<ClaimRewardPage />} />
+                <Route path="/notifications" element={<NotificationPage />} />
+              </Route>
+
+              <Route path="/faq" element={<FaqPage />} />
+              <Route path="/donation" element={<DonationPage />} />
+              <Route path="/login" element={<LoginPage />} />
+
+            </Routes>
           </div>
           <Footer />
         </div>
       </div>
-    </>
+    </AuthProvider>
   );
 }
