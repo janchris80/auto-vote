@@ -14,13 +14,13 @@ const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     getAuthenticatedUser()
-      .then(({authenticated, data}) => {
-        const { username } = data;
+      .then((data) => {
+        const { username, authenticated, proof, } = data;
         // Access and use the data from the resolved promise result
         if (authenticated) {
           setIsAuthenticated(true)
           setUsername(username);
-          setProof(data)
+          setProof(proof)
           // setAuthorityType(authority_type);
         } else {
           navigate('/login', { replace: true });

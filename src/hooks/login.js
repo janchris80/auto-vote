@@ -2,7 +2,7 @@ import axios from 'axios';
 import { storeTokenInLocalStorage } from 'lib/api';
 import { KeychainSDK } from "keychain-sdk";
 
-const BASE_URL = 'http://localhost:5000'; // Define your API base URL here
+const BASE_URL = 'http://localhost:4000'; // Define your API base URL here
 const POSTING_AUTHORITY = 'Posting';
 const LOGIN_REASON = 'Login using Hive';
 
@@ -22,14 +22,18 @@ export const requestHiveLogin = async (username) => {
       throw new Error('Hive Keychain not found');
     }
 
-    const response = await keychain.signBuffer({
+    const response = await keychain.login({
       username: username,
       message: LOGIN_REASON,
       method: POSTING_AUTHORITY,
-      title: "Hive Auto Vote Login"
+      title: "Auto Vote Login"
     });
 
-    await authenticateWithServer(username, response);
+    console.log('login', response);
+    localStorage.setItem('login', JSON.stringify(response))
+
+    const result = await authenticateWithServer(username, response);
+    return result.data;
   } catch (error) {
     throw new Error(error.message);
   }

@@ -13,7 +13,7 @@ const AutoVote = () => {
 
   useEffect(() => {
     // Connect to a Hive node
-    hive.api.setOptions({ url: 'https://rpc.ecency.com/' });
+    hive.api.setOptions({ url: 'https://rpc.d.buzz/' });
     hive.config.set('alternative_api_endpoints', [
       'https://api.hive.blog',
       'https://rpc.ecency.com/',
@@ -31,6 +31,8 @@ const AutoVote = () => {
 
 
     const keychain = new KeychainSDK(window);
+
+    console.log(keychain);
 
     // Function to watch the account for votes
     const watchAccount = async () => {

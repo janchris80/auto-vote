@@ -149,7 +149,6 @@ export default function LandingLayout() {
             <i className="fa fa-heart"></i> for Hive Users
           </div>
         </div>
-        <br /><br /><br />
       </div>
     </>
   );
