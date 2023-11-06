@@ -7,14 +7,14 @@ const jwt = require('jsonwebtoken');
 const cookie = require('cookie');
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 4000;
 
 app.use(cors());
 app.use(bodyParser.json());
 
 // Use environment variables for configuration
 const JWT_SECRET_KEY = process.env.JWT_SECRET_KEY || 'hive-auto-vote-jwt-secret-key';
-const JWT_EXPIRATION = process.env.JWT_EXPIRATION || '1h';
+const JWT_EXPIRATION = process.env.JWT_EXPIRATION || '4h';
 
 app.post('/auth/signin', async (req, res) => {
   try {

@@ -1,9 +1,9 @@
 // Your React component file
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Col, Form, Row, Button, InputGroup } from 'react-bootstrap';
 import { requestHiveLogin } from 'hooks/login.js';
-import { useNavigate } from 'react-router-dom';
+import { redirect, useNavigate } from 'react-router-dom';
 import useAuth from 'hooks/useAuth';
 
 export default function LoginPage() {
@@ -13,15 +13,21 @@ export default function LoginPage() {
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
 
+  useEffect(() => {
+    if(!isAuthenticated) {
+      navigate('/login', { replace: true });
+    } else {
+      navigate('/home', { replace: true });
+    }
+  }, [])
+
   const handleLogin = async (event) => {
     try {
-      await requestHiveLogin(username);
+      const { message, success } = await requestHiveLogin(username);
 
-      // if (isAuthenticated) {
-      //   await navigate('/dashboard', { replace: true });
-      // } else {
-      //   await navigate('/login', { replace: true });
-      // }
+      if (success) {
+        window.location.reload()
+      }
     } catch (error) {
       console.error(error)
     }

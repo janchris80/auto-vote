@@ -2,7 +2,7 @@
 
 import axios from 'axios';
 
-const BASE_URL = 'http://localhost:5000'; // Replace with your backend server URL
+const BASE_URL = 'http://localhost:4000'; // Replace with your backend server URL
 
 export const registerUser = async (userData) => {
   try {

@@ -49,6 +49,8 @@ export default function AdminLayout() {
           <div className="content bg-white">
             <Routes>
 
+              <Route index element={<LoginPage />} />
+
               <Route element={<Auth allowedRoles={['user']} />}>
                 <Route path="/home" element={<HomePage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
