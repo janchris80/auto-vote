@@ -45,11 +45,6 @@ const authService = {
         login: login?.data,
       }));
 
-      return {
-        username,
-        accessToken,
-        hiveUser,
-      };
     } catch (error) {
       throw error;
     }

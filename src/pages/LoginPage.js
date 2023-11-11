@@ -21,6 +21,10 @@ export default function LoginPage() {
   const { isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
+    if (isLoggedIn) {
+      return <Navigate to="/" />;
+    }
+
     userRef.current.focus();
   }, [])
 
@@ -30,9 +34,7 @@ export default function LoginPage() {
 
   const handleLogin = async (event) => {
     try {
-      const { accessToken, hiveUser } = await authService.login(username);
-
-      dispatch(login({ username, accessToken, hiveUser }));
+      await dispatch(login({ username }));
       setUsername('');
       navigate(from, { replace: true });
     } catch (err) {
@@ -57,10 +59,6 @@ export default function LoginPage() {
 
   const handleUsername = (event) => {
     setUsername(event.target.value)
-  }
-
-  if (isLoggedIn) {
-    return <Navigate to="/" />;
   }
 
   return (
