@@ -7,15 +7,13 @@ import {
 export default function DownvoteTrailPage() {
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col>
-            <h1>DownvoteTrail</h1>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid>
+      <Row>
+        <Col>
+          <h1>DownvoteTrail</h1>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

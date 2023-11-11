@@ -1,7 +1,13 @@
-import React, { Component } from "react";
+import { useCallback } from 'react';
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
+import { useDispatch, useSelector } from 'react-redux';
+import { Link } from 'react-router-dom';
+import { logout } from 'slices/auth';
 
 function Header() {
+  const { isLoggedIn } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+
   const mobileSidebarToggle = (e) => {
     e.preventDefault();
     document.documentElement.classList.toggle("nav-open");
@@ -13,6 +19,10 @@ function Header() {
     };
     document.body.appendChild(node);
   };
+
+  const handleLogout = useCallback(() => {
+    dispatch(logout());
+  }, [dispatch]);
 
 
   return (
@@ -43,25 +53,26 @@ function Header() {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="nav mr-auto" navbar>
             <Nav.Item>
-              <Nav.Link
-                className="m-0"
-                href='/faq'
-                onClick={(e) => e.preventDefault()}
-              >
+              <Nav.Link as={Link} to="/faq" className="m-0">
                 FAQ
               </Nav.Link>
             </Nav.Item>
             <Nav.Item>
-              <Nav.Link
-                className="m-0"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-              >
+              <Nav.Link as={Link} to="/donations" className="m-0">
                 <span className="d-lg-block">Donations</span>
               </Nav.Link>
             </Nav.Item>
           </Nav>
           <Nav className="ml-auto" navbar>
+            {
+              isLoggedIn
+                ? (<Nav.Item>
+                  <Nav.Link as={Link} onClick={handleLogout} className="m-0">
+                    Logout
+                  </Nav.Link>
+                </Nav.Item>)
+              : ''
+            }
             <Dropdown as={Nav.Item}>
               <Dropdown.Toggle
                 aria-expanded={false}
@@ -76,19 +87,12 @@ function Header() {
               </Dropdown.Toggle>
 
               <Dropdown.Menu aria-labelledby="navbarDropdownMenuLink">
-                <Dropdown.Item
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                >
+                <Dropdown.Item as={Link} to="/help-video">
                   Help Video
                 </Dropdown.Item>
-                <Dropdown.Item
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                >
+                <Dropdown.Item as={Link} to="/contact-us">
                   Contact Us
                 </Dropdown.Item>
-
               </Dropdown.Menu>
             </Dropdown>
           </Nav>

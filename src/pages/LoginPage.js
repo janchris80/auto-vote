@@ -1,35 +1,44 @@
-// Your React component file
-
-import { useEffect, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Col, Form, Row, Button, InputGroup } from 'react-bootstrap';
-import { requestHiveLogin } from 'hooks/login.js';
-import { redirect, useNavigate } from 'react-router-dom';
-import useAuth from 'hooks/useAuth';
+import { useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { useDispatch, useSelector } from "react-redux";
+
+
+import authService from 'api/services/authService';
+import { login } from 'slices/auth';
 
 export default function LoginPage() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+  const userRef = useRef();
+  const errRef = useRef();
   const [username, setUsername] = useState('');
   const [validated, setValidated] = useState(false);
-  const from = location.state?.from?.pathname || "/dashboard"
-  const navigate = useNavigate();
-  const { isAuthenticated } = useAuth();
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const { isLoggedIn } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if(!isAuthenticated) {
-      navigate('/login', { replace: true });
-    } else {
-      navigate('/home', { replace: true });
-    }
+    userRef.current.focus();
   }, [])
+
+  useEffect(() => {
+    setErrorMessage('');
+  }, [username])
 
   const handleLogin = async (event) => {
     try {
-      const { message, success } = await requestHiveLogin(username);
+      const { accessToken, hiveUser } = await authService.login(username);
 
-      if (success) {
-        window.location.reload()
-      }
-    } catch (error) {
-      console.error(error)
+      dispatch(login({ username, accessToken, hiveUser }));
+      setUsername('');
+      navigate(from, { replace: true });
+    } catch (err) {
+      console.error(err);
+      setErrorMessage(`${err.message}`);
+      errRef.current.focus();
     }
   };
 
@@ -42,7 +51,7 @@ export default function LoginPage() {
       event.stopPropagation();
     }
 
-    await setValidated(true);
+    setValidated(true);
     await handleLogin();
   };
 
@@ -50,49 +59,36 @@ export default function LoginPage() {
     setUsername(event.target.value)
   }
 
-  return (
-    <>
-      <Form noValidate validated={validated} onSubmit={handleSubmit}>
-        <Row className="mb-3">
-          <Form.Group as={Col} md="4" controlId="validationCustomUsername">
-            <Form.Label>Username</Form.Label>
-            <InputGroup hasValidation>
-              <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
-              <Form.Control
-                type="text"
-                placeholder="Username"
-                value={username}
-                onChange={handleUsername}
-                aria-describedby="inputGroupPrepend"
-                required
-              />
-              <Form.Control.Feedback type="invalid">
-                Please enter your username.
-              </Form.Control.Feedback>
-            </InputGroup>
-          </Form.Group>
-        </Row>
-        <Button type="submit">Login</Button>
-      </Form>
-      <Row>
-        <Col>
+  if (isLoggedIn) {
+    return <Navigate to="/" />;
+  }
 
-          {/* <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              type="text"
-              className="form-control"
-              id="username"
-              aria-describedby="username"
-              placeholder="Enter username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-          </div> */}
-          {/* <button onClick={handleLogin} className='btn btn-primary'>Login</button> */}
-          {/* <NavLink to='/' className='btn btn-primary'>Back</NavLink> */}
-        </Col>
+  return (
+    <Form noValidate validated={validated} onSubmit={handleSubmit}>
+      <Row>
+        <p ref={errRef} className={errorMessage ? "errmsg" : "offscreen"} aria-live="assertive">{errorMessage}</p>
       </Row>
-    </>
+      <Row>
+        <Form.Group as={Col} md="4" controlId="validationCustomUsername">
+          <Form.Label>Username</Form.Label>
+          <InputGroup hasValidation>
+            <InputGroup.Text id="inputGroupPrepend">@</InputGroup.Text>
+            <Form.Control
+              type="text"
+              placeholder="Username"
+              ref={userRef}
+              value={username}
+              onChange={handleUsername}
+              aria-describedby="inputGroupPrepend"
+              required
+            />
+            <Form.Control.Feedback type="invalid">
+              Please enter your username.
+            </Form.Control.Feedback>
+          </InputGroup>
+        </Form.Group>
+      </Row>
+      <Button type="submit" onClick={handleLogin}>Login</Button>
+    </Form>
   );
 }

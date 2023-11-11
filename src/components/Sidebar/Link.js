@@ -6,16 +6,12 @@ export default function Link({ path, icon, name, upgrade }) {
 
   const activeRoute = (routeName) => location.pathname.indexOf(routeName) > -1 ? "active" : "";
 
-  return <li
-    className={
-      upgrade
-        ? "active active-pro"
-        : activeRoute(path)
-    }
-  >
+  const isUpgrade = upgrade ? "active active-pro" : activeRoute(path);
+
+  return <li className={isUpgrade} >
     <NavLink
       to={path}
-      className="nav-link text-black font-weight-light"
+      className={`nav-link text-black font-weight-light` + activeRoute}
     >
       <i className={icon} />
       <p>{name}</p>
