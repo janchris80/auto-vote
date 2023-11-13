@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { KeychainSDK } from "keychain-sdk";
 // react-bootstrap components
 import {
@@ -11,10 +11,14 @@ import {
   Table,
 } from "react-bootstrap";
 import { useState } from 'react';
+import { useSelector } from 'react-redux';
 
 export default function SchedulePostPage() {
   const keychain = new KeychainSDK(window, { rpc: 'https://rpc.d.buzz/' });
   const [data, setData] = useState([]);
+  const [username, setUsername] = useState([]);
+  const { user } = useSelector((state) => state.auth);
+  console.log(user.username);
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -28,11 +32,15 @@ export default function SchedulePostPage() {
 
   const loginData = JSON.parse(localStorage.getItem('login'))
 
+  useEffect(() => {
+    setUsername(user.username)
+  }, [username])
+
   const handlePost = async () => {
     try {
       const formParamsAsObject = {
         data: {
-          username: loginData?.data?.username,
+          username,
           title: title,
           body: body,
           parent_perm: parentPerm,
@@ -87,12 +95,11 @@ export default function SchedulePostPage() {
 
   return (
     <Container fluid>
-      <Row style={{ margin: "0 !important" }}>
-        <Col md={2}></Col>
-        <Col style={{}} md={8}>
+      <Row>
+        <Col>
           <Card>
             <Card.Body>
-              <h3>Welcome {name},</h3>
+              <h3>Welcome {username},</h3>
               <br />
               This page is where you can schedule a post to publish in the future.
               <br />
@@ -185,10 +192,9 @@ export default function SchedulePostPage() {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={2}></Col>
       </Row>
-      <Row style={{ margin: "0 !important" }}>
-        <Col style={{}} md={12}>
+      <Row>
+        <Col>
           <Card>
             <Card.Body>
               <h3 style={{ paddingBottom: "10px" }}>Scheduled Posts:</h3>

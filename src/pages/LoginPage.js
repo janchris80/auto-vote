@@ -3,8 +3,6 @@ import { Col, Form, Row, Button, InputGroup } from 'react-bootstrap';
 import { useNavigate, useLocation, Navigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 
-
-import authService from 'api/services/authService';
 import { login } from 'slices/auth';
 
 export default function LoginPage() {

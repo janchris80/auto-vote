@@ -11,7 +11,9 @@ export default function Link({ path, icon, name, upgrade }) {
   return <li className={isUpgrade} >
     <NavLink
       to={path}
-      className={`nav-link text-black font-weight-light` + activeRoute}
+      // className={`nav-link text-black font-weight-light` + activeRoute}
+      className="nav-link text-black font-weight-light"
+      activeClass="active"
     >
       <i className={icon} />
       <p>{name}</p>

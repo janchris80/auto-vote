@@ -37,12 +37,11 @@ function Header() {
             <i className="fas fa-ellipsis-v"></i>
           </Button>
           <Navbar.Brand
-            href="#"
-            onClick={(e) => e.preventDefault()}
+            as={Link}
+            to="/"
             className="mr-2 font-weight-bold text-black"
           >
-            {/* {getBrandText()} */}
-            <i className='text-red'>Hive</i>Vote
+            <span className='text-red'>Hive</span>Vote
           </Navbar.Brand>
         </div>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="mr-2">
@@ -64,15 +63,6 @@ function Header() {
             </Nav.Item>
           </Nav>
           <Nav className="ml-auto" navbar>
-            {
-              isLoggedIn
-                ? (<Nav.Item>
-                  <Nav.Link as={Link} onClick={handleLogout} className="m-0">
-                    Logout
-                  </Nav.Link>
-                </Nav.Item>)
-              : ''
-            }
             <Dropdown as={Nav.Item}>
               <Dropdown.Toggle
                 aria-expanded={false}
@@ -95,6 +85,15 @@ function Header() {
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
+            {
+              isLoggedIn
+                ? (<Nav.Item>
+                  <Nav.Link as={Link} onClick={handleLogout} className="m-0">
+                    Logout
+                  </Nav.Link>
+                </Nav.Item>)
+                : ''
+            }
           </Nav>
         </Navbar.Collapse>
       </Container>

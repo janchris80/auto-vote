@@ -28,7 +28,7 @@ const Layout = () => {
       <Sidebar />
       <div className="main-panel main-context" ref={mainPanel}>
         <Header />
-        <div className="content bg-white">
+        <div className="content">
           <Outlet />
         </div>
         <Footer />

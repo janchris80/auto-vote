@@ -89,9 +89,22 @@ body > .navbar-collapse{
                 border-radius: 4px;
                 display: block;
                 padding: 10px 15px;
+                cursor: pointer;
+
+                // width: max-content;
+                height: 50px;
+                // display: grid;
+                // font-size: 18px;
+                transition: background-color 250ms;
+                font-family: Segoe, sans-serif;
+                place-items: center;
+                border-radius: 50px 50px;
+                margin-bottom: 8px;
+                // border: 1px solid red;
+
 
                 &:hover{
-                    background: rgba(255, 255, 255, 0.13);
+                    background: #ffebee;
                     opacity: 1;
                 }
 
@@ -122,8 +135,9 @@ body > .navbar-collapse{
             &.active .nav-link{
                 color: $white-color;
                 opacity: 1;
-                background: rgba(255,255,255,0.23);
-
+                background: rgba(216, 3, 3, 0.23);
+                font-size: larger;
+                font-family: Segoe;
             }
 
             &.separator{
@@ -220,10 +234,10 @@ body > .navbar-collapse{
         z-index: 2;
     }
 
-    &:before{
-        opacity: .33;
-        background: #000000;
-    }
+    // &:before{
+    //     opacity: .33;
+    //     background: #000000;
+    // }
 
     &:after{
        @include icon-gradient($new-purple, $purple-color-bottom);
@@ -256,6 +270,9 @@ body > .navbar-collapse{
     }
     &[data-color="purple"]:after{
         @include icon-gradient($new-purple, $purple-color-bottom);
+    }
+    &[data-color="white"]:after{
+        @include icon-gradient($new-white, $white-color);
     }
 }
 

@@ -11,6 +11,37 @@ const instance = axios.create({
     withCredentials: true,
 });
 
+const { accessToken } = JSON.parse(localStorage.getItem("user"));
+
+const postRequest = (url, data = {}) => {
+    return instance.post(url, data,
+        {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`, // Include the bearer token
+            },
+        }
+    )
+}
+
+const getRequest = (url) => {
+    return instance.get(url,
+        {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`, // Include the bearer token
+            },
+        }
+    )
+}
+
+const getPublicRequest = (url) => {
+    return instance.get(url);
+}
+
+const postPublicRequest = (url, data = {}) => {
+    return instance.post(url, data);
+}
+
+
 // Laravel Sanctum provides a route to retrieve the CSRF token
 // export const fetchCSRFToken = async () => {
 //     try {
@@ -39,5 +70,7 @@ const instance = axios.create({
 //         return Promise.reject(error);
 //     }
 // );
+
+export { postRequest, getRequest, postPublicRequest, getPublicRequest };
 
 export default instance;

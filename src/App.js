@@ -18,7 +18,6 @@ import DonationPage from 'pages/DonationPage';
 import ContactUsPage from 'pages/ContactUsPage';
 import HelpVideoPage from 'pages/HelpVideoPage';
 
-
 function App() {
 
   return (
