@@ -18,14 +18,12 @@ import {
 export default function UpvoteCommentPage() {
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col>
-            <h1>UpvoteComment</h1>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid>
+      <Row>
+        <Col>
+          <h1>UpvoteComment</h1>
+        </Col>
+      </Row>
+    </Container>
   );
 }

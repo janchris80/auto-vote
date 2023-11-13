@@ -1,228 +1,264 @@
-import { Container, Table, Button, Row, Card, Col } from 'react-bootstrap';
+import React, { useState, useEffect } from 'react';
+import { Container, Table, Button, Row, Card, Col, Pagination, InputGroup, Form, Spinner } from 'react-bootstrap';
+import axios, { postRequest } from 'api/axios/instance';
+import { NavLink } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { popular, following } from 'slices/curation';
 
-import { useState, useEffect } from 'react';
-import hiveJs from 'lib/hive-js';
+const CurationTrailPage = () => {
+  const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+  const {
+    popularCurations,
+    followingCurations,
+    followingCurrentPage,
+    followingTotalPages,
+    popularCurrentPage,
+    popularTotalPages,
+  } = useSelector((state) => state.curations);
 
-export default function CurationTrailPage() {
-  const hive = hiveJs();
-  const [data, setData] = useState([])
+  const [popularPage, setPopularPage] = useState(popularCurrentPage);
+  const [followingPage, setFollowingPage] = useState(followingCurrentPage);
 
+  // Loading state for Follow/Unfollow button
+  const [loadingFollow, setLoadingFollow] = useState(false);
 
-  // hive.api.callAsync('condenser_api.get_accounts', [['dbuzz']])
-  //   .then((res) => console.log(res))
-  const [trendingData, setTrendingData] = useState([]);
-  const [afterTag, setAfterTag] = useState('');
-  const [loading, setLoading] = useState(false);
+  const fetchCurations = async (page, dispatchAction) => {
+    try {
+      await dispatch(dispatchAction({ page }));
+    } catch (error) {
+      throw new Error(error);
+    }
+  };
 
-  const followUser = async () => {
-    let status = hive.api
-      .callAsync('condenser_api.get_following', ["dbuzz", "nhongz", "blog", 3])
-      .then((res) => {
-        console.log('res', res);
-      })
+  const handleFollow = async (userId, follow = true) => {
+    const action = follow ? 'unfollow' : 'follow';
 
-    console.log('status', status);
-  }
+    try {
+      setLoadingFollow(true); // Set loading state to true
+
+      await postRequest(`/api/followers/${action}`, {
+        user_id: userId,
+        type: 'curation',
+      });
+      await fetchCurations(popularPage, popular);
+      await fetchCurations(followingPage, following);
+    } catch (error) {
+      throw new Error(error);
+    } finally {
+      setLoadingFollow(false); // Set loading state back to false
+    }
+  };
+
+  const handlePageChange = (page, setPage) => setPage(page);
+
+  const getFollowButtonProps = (popularCuration) => {
+    const isFollowing = popularCuration?.followers?.some((follower) => follower.follower_id === user?.userData?.id);
+
+    return {
+      disabled: false,
+      text: isFollowing ? 'Unfollow' : 'Follow',
+      variant: isFollowing ? 'danger' : 'success',
+    };
+  };
+
+  const handleFollowButtonClick = (popularCuration) => {
+    const { disabled, text } = getFollowButtonProps(popularCuration);
+    if (!disabled) {
+      const isUnfollow = text === 'Unfollow';
+      handleFollow(popularCuration.id, isUnfollow);
+    }
+  };
 
   useEffect(() => {
-    if (trendingData.length === 0) {
-      fetchTrendingData();
-    }
-  }, [])
+    const fetchData = async () => {
+      try {
+        await fetchCurations(popularPage, popular);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
 
-  const fetchTrendingData = () => {
-    if (!loading) {
-      setLoading(true);
-      hive.api.getTrendingTags(afterTag, 10, (err, result) => {
-        if (err) {
-          console.error(err);
-        } else {
-          const newDataPromises = result.map(async (tag) => {
-            const followCount = await getFollowCount(tag.name);
-            return { name: tag.name, followCount: followCount };
-          });
+    // Cleanup function (if needed)
+    return () => { };
+  }, [popularPage]);
 
-          Promise.all(newDataPromises).then((newData) => {
-            setTrendingData((prevTrendingData) => [...prevTrendingData, ...newData]);
-            if (result.length > 0) {
-              setAfterTag(result[result.length - 1].name);
-            }
-            setLoading(false);
-          });
-        }
-      });
-      console.log(trendingData);
-    }
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await fetchCurations(followingPage, following);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+    fetchData();
 
-  const getFollowCount = (account) => {
-    return new Promise((resolve, reject) => {
-      hive.api.getFollowCount(account, (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
-    });
-  };
+    // Cleanup function (if needed)
+    return () => { };
+  }, [followingPage]);
 
   return (
-    <Container style={{ margin: "0 !important" }}>
+    <Container fluid>
       <Row>
-        <Col md={12}>
-          <Card>
-            <Card.Body>
-              <h3 style={{ borderBottom: "1px solid #000", paddingBottom: "10px" }}>
-                You are following:
-                <Button style={{ float: "right" }} variant="primary" onClick={() => modalforselectedtrails()}>
-                  Settings for selections
-                </Button>
-              </h3>
-              <div style={{ maxHeight: "600px", overflow: "auto" }} className="table-responsive-vertical shadow-z-1">
-                <Table className="table table-hover table-mc-light-blue" id="table">
-                  <thead>
-                    <tr>
-                      <th>
-                        <input type="checkbox" name="" onClick={() => togglecheckbox(this)} value="" id="selectall" />
-                      </th>
-                      <th>#</th>
-                      <th>Username</th>
-                      <th>Followers</th>
-                      <th>Weight</th>
-                      <th>Method</th>
-                      <th>Wait Time</th>
-                      <th>Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {data.map((item, index) => (
-                      <tr className="tr1" key={index}>
-                        <td data-title="ID">
-                          <input type="checkbox" name="trail_id" value="" id={item.user} />
+        <Col md="12">
+          <InputGroup className="mb-3">
+            <Form.Control style={{ height: '44px' }} placeholder="Find a @username" />
+            <Button variant="outline-secondary" id="button-addon2">
+              Button
+            </Button>
+          </InputGroup>
+        </Col>
+        <Col md="12">
+          <Card className="strpied-tabled-with-hover">
+            <Card.Header>
+              <Card.Title as="h4">You are following</Card.Title>
+              <p className="card-category">{/* Here is a subtitle for this table */}</p>
+            </Card.Header>
+            <Card.Body className="table-full-width table-responsive px-0">
+              <Table className="table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th className="border-0"></th>
+                    <th className="border-0">#</th>
+                    <th className="border-0">Username</th>
+                    <th className="border-0">Followers</th>
+                    <th className="border-0">Weight</th>
+                    <th className="border-0">Method</th>
+                    <th className="border-0">Wait Time</th>
+                    <th className="border-0">Status</th>
+                    <th className="border-0">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {followingCurations.length !== 0 ? (
+                    followingCurations?.map((followingCuration, index) => (
+                      <tr key={index}>
+                        <td>
+                          <input type="checkbox" />
                         </td>
-                        <td data-title="ID">{item.k}</td>
-                        <td data-title="Name">
-                          <a href={`/dash.php?i=1&trail=${item.user}`} target="_blank">@{item.user}</a>
+                        <td>{index + 1 + (followingCurrentPage - 1) * 10}</td>
+                        <td>
+                          <NavLink>@{followingCuration.username}</NavLink>
                         </td>
-                        <td data-title="Status">{item.followers}</td>
-                        <td data-title="Status">{item.w}</td>
-                        <td data-title="Status">{item.method}</td>
-                        <td data-title="Status">{item.n.aftermin} min</td>
-                        <td data-title="Status" dangerouslySetInnerHTML={{ __html: item.status }}></td>
-                        <td data-title="Status">
-                          <a title="Settings" data-toggle="modal" onClick={() => $(`[id='myModal${item.user}']`).modal("show")} className="pe-7s-config action-icon action-config-icon"></a>
-                          <a title="Delete" onClick={() => { if (window.confirm("Are you sure?")) { unfollow(item.user) } }} className="pe-7s-close-circle action-icon action-close-icon"></a>
+                        <td>{followingCuration.followers_count}</td>
+                        <td>{followingCuration.weight}</td>
+                        <td>{followingCuration.method}</td>
+                        <td>{followingCuration.wait_time}</td>
+                        <td>{followingCuration.status}</td>
+                        <td className=''>
+                          {/* Show loading spinner when loadingFollow is true */}
+                          {loadingFollow ? (
+                            <Spinner size='sm' animation="border" role="status">
+                              <span className="sr-only">Loading...</span>
+                            </Spinner>
+                          ) : (
+                            <>
+                              <Button size="sm">Settings</Button>
+                              <Button
+                                size="sm"
+                                variant='danger'
+                                onClick={() => handleFollow(followingCuration.id, true)}
+                                disabled={loadingFollow} // Disable button when loading
+                              >
+                                Remove
+                              </Button>
+                            </>
+                          )}
                         </td>
-                        <Modal show={false} onHide={() => $(`[id='myModal${item.user}']`).modal("hide")} id={`myModal-${item.user}`} role="dialog">
-                          <Modal.Dialog>
-                            <Modal.Header closeButton>
-                              <Modal.Title>Settings: @{item.user}</Modal.Title>
-                            </Modal.Header>
-                            <Modal.Body>
-                              <div style={{ textAlign: "left", display: "", padding: "20px" }} id={`set${item.k}`} className="col-md-12">
-                                <form onSubmit={() => settings(item.user)}>
-                                  <b style={{ color: "orange" }}>
-                                    Read <a target="_blank" href="/faq.php">FAQ</a> before editing.
-                                  </b>
-                                  <br />
-                                  <br />
-                                  <div style={{ border: "1px solid #ddd", padding: "5px" }} className="form-group">
-                                    <strong>
-                                      Settings for Trailer:{" "}
-                                      <a href={`https://steemit.com/@${item.user}`} target="_blank">
-                                        @{item.user}
-                                      </a>
-                                    </strong>
-                                    <br />
-                                    <br />
-                                    <div className="form-check" style={{ marginBottom: "5px" }}>
-                                      <input className="form-check-input" type="checkbox" value="" id={`enable${item.user}`} checked={item.n.enable} />
-                                      <label style={{ color: "#2b0808" }} className="form-check-label" id="enabling" htmlFor="defaultCheck1">
-                                        Enable (uncheck for disabling)
-                                      </label>
-                                    </div>
-                                    <div style={{ border: "1px solid #ddd", padding: "5px" }} className="form-group">
-                                      <label>Voting weight (%): (Default is 50%)</label>
-                                      <input id={`weight${item.user}`} placeholder="Voting weight" name="weight" type="number" className="form-control" value={item.n.weight / 100} step="0.01" min="0" max="100" />
-                                      <div className="form-check">
-                                        <label style={{ color: "#2b0808" }} className="form-check-label">
-                                          <input className="form-check-input" type="radio" name={`votingway${item.user}`} id="votingway" value="1" checked={item.n.votingway === 1} />
-                                          Scale voting weight (default)
-                                        </label>
-                                      </div>
-                                      <div className="form-check">
-                                        <label style={{ color: "#2b0808" }} className="form-check-label">
-                                          <input className="form-check-input" type="radio" name={`votingway${item.user}`} id="votingway" value="2" checked={item.n.votingway === 2} />
-                                          Fixed voting weight
-                                        </label>
-                                      </div>
-                                    </div>
-                                    <label>Time to wait before voting (minutes): (Default is 0)</label>
-                                    <input id={`aftermin${item.user}`} value={item.n.aftermin} placeholder="Upvoting After X Minutes." name="aftermin" type="number" className="form-control" step="1" min="0" max="30" />
-                                    <input style={{ marginTop: "10px" }} value="Save Settings" type="submit" className="btn btn-primary" />
-                                  </div>
-                                </form>
-                              </div>
-                            </Modal.Body>
-                            <Modal.Footer>
-                              <Button variant="secondary" onClick={() => $(`[id='myModal${item.user}']`).modal("hide")}>Close</Button>
-                            </Modal.Footer>
-                          </Modal.Dialog>
-                        </Modal>
                       </tr>
-                    ))}
-                  </tbody>
-                </Table>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={9} style={{ textAlign: 'center' }}>
+                        None
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </Table>
+              <div className="d-flex justify-content-center mt-4">
+                <Pagination>
+                  <Pagination.First onClick={() => handlePageChange(1, setFollowingPage)} />
+                  <Pagination.Prev
+                    onClick={() => handlePageChange(followingPage === 1 ? followingPage : followingPage - 1, setFollowingPage)}
+                  />
+                  <Pagination.Item>{followingPage}</Pagination.Item>
+                  <Pagination.Next
+                    onClick={() =>
+                      handlePageChange(followingPage === followingTotalPages ? followingPage : followingPage + 1, setFollowingPage)
+                    }
+                  />
+                  <Pagination.Last onClick={() => handlePageChange(followingTotalPages, setFollowingPage)} />
+                </Pagination>
               </div>
             </Card.Body>
           </Card>
         </Col>
       </Row>
-
       <Row>
-        <Col md={12}>
-          <Card>
-            <Card.Body>
-              <h3 style={{ borderBottom: "1px solid #000", paddingBottom: "10px" }}>Popular Curation Trails: </h3>
-              <div style={{ maxHeight: "600px", overflow: "auto" }} className="table-responsive-vertical shadow-z-1">
-                <Table className="table table-hover table-mc-light-blue" id="table">
-                  <thead>
+        <Col md="12">
+          <Card className="strpied-tabled-with-hover">
+            <Card.Header>
+              <Card.Title as="h4">Popular Curation Trails</Card.Title>
+              <p className="card-category">{/* Here is a subtitle for this table */}</p>
+            </Card.Header>
+            <Card.Body className="table-full-width table-responsive px-0">
+              <Table className="table-hover table-striped">
+                <thead>
+                  <tr>
+                    <th className="border-0">#</th>
+                    <th className="border-0">Username</th>
+                    <th className="border-0">Description</th>
+                    <th className="border-0">Followers</th>
+                    <th className="border-0">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {popularCurations.length !== 0 ? (
+                    popularCurations.map((popularCuration, index) => (
+                      <tr key={popularCuration.id}>
+                        <td>{index + 1 + (popularCurrentPage - 1) * 10}</td>
+                        <td>
+                          <NavLink>@{popularCuration.username}</NavLink>
+                        </td>
+                        <td>{popularCuration.description ?? 'None'}</td>
+                        <td>{popularCuration.followings_count}</td>
+                        <td>
+                          <Button
+                            size="sm"
+                            variant={getFollowButtonProps(popularCuration).variant}
+                            onClick={() => handleFollowButtonClick(popularCuration)}
+                            disabled={getFollowButtonProps(popularCuration).disabled}
+                          >
+                            {getFollowButtonProps(popularCuration).text}
+                          </Button>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
                     <tr>
-                      <th>#</th>
-                      <th>Username</th>
-                      <th>Description</th>
-                      <th>Followers</th>
-                      <th>Action</th>
+                      <td colSpan={5} style={{ textAlign: 'center' }}>
+                        No Users
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody>
-                    {trendingData.map((data, index) => {
-                      console.log(data);
-                      return (
-                        <tr className="tr2" key={index}>
-                          <td data-title="ID">{index + 1}</td>
-                          <td data-title="Name">
-                            <a href="#" target="_blank">@{data.name}</a>
-                          </td>
-                          <td data-title="Link"></td>
-                          <td data-title="Status">{data.followCount.follower_count}</td>
-                          <td data-title="Status">
-                            <Button onClick={() => { if (window.confirm('Are you sure?')) { follow('') } }} variant="primary">FOLLOW</Button>
-                            {/* <Button onClick={() => { if (window.confirm('Are you sure?')) { unfollow('') } }} variant="danger">UNFOLLOW</Button> */}
-                          </td>
-                          <td data-title="Status"></td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </Table>
-                <div style={{ textAlign: "center" }}>
-                  {/* <a className="btn btn-primary" href="/dash.php?i=1">First page</a>
-                  <a className="btn btn-primary" href="/dash.php?i=1&p=1">Previous page</a> */}
-                  <a className="btn btn-primary" onClick={fetchTrendingData}>Load More</a>
-                </div>
+                  )}
+                </tbody>
+              </Table>
+              <div className="d-flex justify-content-center mt-4">
+                <Pagination>
+                  <Pagination.First onClick={() => handlePageChange(1, setPopularPage)} />
+                  <Pagination.Prev
+                    onClick={() => handlePageChange(popularPage === 1 ? popularPage : popularPage - 1, setPopularPage)}
+                  />
+                  <Pagination.Item>{popularPage}</Pagination.Item>
+                  <Pagination.Next
+                    onClick={() =>
+                      handlePageChange(popularPage === popularTotalPages ? popularPage : popularPage + 1, setPopularPage)
+                    }
+                  />
+                  <Pagination.Last onClick={() => handlePageChange(popularTotalPages, setPopularPage)} />
+                </Pagination>
               </div>
             </Card.Body>
           </Card>
@@ -230,4 +266,6 @@ export default function CurationTrailPage() {
       </Row>
     </Container>
   );
-}
+};
+
+export default CurationTrailPage;

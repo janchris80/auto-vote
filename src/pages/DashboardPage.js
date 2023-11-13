@@ -1,27 +1,24 @@
-import AutoVote from 'hooks/AutoVote';
-import useAuth from 'hooks/useAuth';
 import { useState } from 'react';
 import { useEffect } from "react";
 // react-bootstrap components
 import {
-  Badge,
   Button,
   Card,
-  Navbar,
-  Nav,
-  Table,
   Container,
   Row,
   Col,
   Form,
-  OverlayTrigger,
-  Tooltip,
 } from "react-bootstrap";
+import { useSelector } from 'react-redux';
 
 
 export default function DashboardPage() {
+  const { user } = useSelector((state) => state.auth);
+  const [username, setUsername] = useState('');
 
-  const { username } = useAuth();
+  useEffect(() => {
+    setUsername(user?.username)
+  }, [user])
 
   const [powerLimit, setPowerLimit] = useState('');
   const [powernow, setPowerNow] = useState('');
@@ -51,11 +48,9 @@ export default function DashboardPage() {
   }, []);
 
   return (
-
     <Container fluid>
-      <Row style={{ marginTop: 50 }}>
-        <Col md={3}></Col>
-        <Col md={6}>
+      <Row>
+        <Col>
           <Card>
             <Card.Body>
               <h5 style={{ color: "red" }}>
@@ -96,61 +91,56 @@ export default function DashboardPage() {
             </Card.Body>
           </Card>
         </Col>
-        <Col md={3}></Col>
       </Row>
 
-      <Row style={{ marginBottom: '5px', paddingBottom: '5px' }}>
-        <Col md={3}></Col>
-        <Col md={6}>
-          <div className="content">
-            <Card id="settings">
-              <Card.Body>
-                <center>
-                  <h4 style={{ borderBottom: '1px solid #000', paddingBottom: '10px' }}>Settings</h4>
-                </center>
-                <strong>Upvoting status:</strong>
-                <span id="upvoting_status"></span>
-                <br />
-                <strong>Current Mana:</strong>
-                <span id="voting_power"></span>
-                <br />
-                <strong>Limit on Mana:</strong>
-                <span>
-                  100% <Button variant="link" onClick={() => setLimitPower(!limitPower)}>
-                    (Click to edit)
-                  </Button>
-                </span>
-                <br />
-                <Form onSubmit={handleFormSubmit} style={{ display: 'none' }}>
-                  <Form.Group>
-                    <Form.Label htmlFor="powerlimit">Mana limitation (%):</Form.Label>
-                    <Form.Control
-                      id="powerlimit"
-                      name="powerlimit"
-                      type="number"
-                      min="1"
-                      max="99"
-                      step="0.01"
-                      value={powerLimit}
-                      onChange={(e) => setPowerLimit(e.target.value)}
-                      required
-                    />
-                  </Form.Group>
-                  <Button type="submit" style={{ marginTop: '5px' }} variant="primary">
-                    Submit
-                  </Button>
-                </Form>
-                <br />
-                <p>All your upvotes will be paused if your Mana is lower than the Mana limitation.</p>
-                <p>Read more about Mana in the Steemit FAQ.</p>
-                <p>
-                  You can check your Mana here: <a href="https://steemd.com/@iamjc93">https://steemd.com/@iamjc93</a>
-                </p>
-              </Card.Body>
-            </Card>
-          </div>
+      <Row>
+        <Col>
+          <Card id="settings">
+            <Card.Body>
+              <center>
+                <h4 style={{ borderBottom: '1px solid #000', paddingBottom: '10px' }}>Settings</h4>
+              </center>
+              <strong>Upvoting status:</strong>
+              <span id="upvoting_status"></span>
+              <br />
+              <strong>Current Mana:</strong>
+              <span id="voting_power"></span>
+              <br />
+              <strong>Limit on Mana:</strong>
+              <span>
+                100% <Button variant="link" onClick={() => setLimitPower(!limitPower)}>
+                  (Click to edit)
+                </Button>
+              </span>
+              <br />
+              <Form onSubmit={handleFormSubmit} style={{ display: 'none' }}>
+                <Form.Group>
+                  <Form.Label htmlFor="powerlimit">Mana limitation (%):</Form.Label>
+                  <Form.Control
+                    id="powerlimit"
+                    name="powerlimit"
+                    type="number"
+                    min="1"
+                    max="99"
+                    step="0.01"
+                    value={powerLimit}
+                    onChange={(e) => setPowerLimit(e.target.value)}
+                    required
+                  />
+                </Form.Group>
+                <Button type="submit" style={{ marginTop: '5px' }} variant="primary">
+                  Submit
+                </Button>
+              </Form>
+              <br />
+              <p>All your upvotes will be paused if your Mana is lower than the Mana limitation.</p>
+              <p>Read more about Mana in the Steemit FAQ.</p>
+              <p>
+                You can check your Mana here: <a href={`https://hiveblocks.com/${username}`}>https://hiveblocks.com/{username}</a>
+              </p>
+            </Card.Body>
+          </Card>
         </Col>
-        <Col md={3}></Col>
       </Row>
     </Container>
 

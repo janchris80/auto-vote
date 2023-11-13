@@ -17,15 +17,13 @@ import {
 export default function NotificationPage() {
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col>
-            <h1>Notification</h1>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid>
+      <Row>
+        <Col>
+          <h1>Notification</h1>
+        </Col>
+      </Row>
+    </Container>
   );
 }
 

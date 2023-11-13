@@ -1,17 +1,15 @@
 import axios from 'axios';
 import { storeTokenInLocalStorage } from 'lib/api';
 import { KeychainSDK } from "keychain-sdk";
+import { login, logout } from './api';
 
-const BASE_URL = 'http://localhost:4000'; // Define your API base URL here
+const BASE_URL = 'http://localhost:8000'; // Define your API base URL here
 const POSTING_AUTHORITY = 'Posting';
 const LOGIN_REASON = 'Login using Hive';
 
 const createAxiosInstance = () => {
   return axios.create({
     baseURL: BASE_URL,
-    headers: {
-      'Content-Type': 'application/json',
-    },
   });
 };
 
@@ -29,11 +27,13 @@ export const requestHiveLogin = async (username) => {
       title: "Auto Vote Login"
     });
 
-    console.log('login', response);
-    localStorage.setItem('login', JSON.stringify(response))
+    if (response) {
+      console.log(response);
+    }
 
-    const result = await authenticateWithServer(username, response);
-    return result.data;
+    await logout();
+    await login(username);
+
   } catch (error) {
     throw new Error(error.message);
   }
@@ -49,8 +49,7 @@ const authenticateWithServer = async (username, result) => {
   };
 
   try {
-    const axiosInstance = createAxiosInstance();
-    const response = await axiosInstance.post('/auth/signin', data);
+    const response = await login(username);
     console.log('authenticateWithServer_response', response);
     storeTokenInLocalStorage(response.data.token);
     return response;

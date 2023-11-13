@@ -18,14 +18,12 @@ import {
 export default function HomePage() {
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col>
-            <h1>Home</h1>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid>
+      <Row>
+        <Col>
+          <h1>Home</h1>
+        </Col>
+      </Row>
+    </Container>
   );
 }

@@ -7,14 +7,12 @@ import {
 export default function DonationPage() {
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col>
-            <h1>Donation Page</h1>
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid>
+      <Row>
+        <Col>
+          <h1>Donation Page</h1>
+        </Col>
+      </Row>
+    </Container>
   );
 }

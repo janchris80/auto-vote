@@ -1,0 +1,104 @@
+Arguments: 
+  C:\Program Files\nodejs\node.exe C:\Program Files\nodejs\node_modules\yarn\bin\yarn.js add @reduxjs/tookkit react-redux
+
+PATH: 
+  C:\Program Files\WindowsApps\Microsoft.PowerShell_7.3.9.0_x64__8wekyb3d8bbwe;C:\Python311\Scripts\;C:\Python311\;C:\Program Files (x86)\Common Files\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Windows\System32\OpenSSH\;C:\Program Files\Git\cmd;C:\Program Files (x86)\GitExtensions\;C:\Program Files\dotnet\;C:\Program Files (x86)\NVIDIA Corporation\PhysX\Common;C:\Program Files\NVIDIA Corporation\NVIDIA NvDLISR;C:\Program Files\PuTTY\;C:\Program Files (x86)\WinSCP\;C:\laragon\bin\php\php-8.0.25-nts-Win32-vs16-x64;C:\ProgramData\chocolatey\bin;C:\Users\iamjc\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Users\iamjc\AppData\Local\Microsoft\WindowsApps;C:\Users\iamjc\AppData\Local\GitHubDesktop\bin;C:\Program Files\JetBrains\PhpStorm 2022.3.1\bin;;C:\Users\iamjc\AppData\Local\Programs\Microsoft VS Code\bin;C:\Users\iamjc\AppData\Roaming\nvm;C:\Program Files\nodejs;C:\Users\iamjc\AppData\Local\Programs\oh-my-posh\bin;C:\Program Files\OpenSSL-Win64\bin;
+
+Yarn version: 
+  1.22.19
+
+Node version: 
+  16.13.0
+
+Platform: 
+  win32 x64
+
+Trace: 
+  Error: https://registry.yarnpkg.com/@reduxjs%2ftookkit: Not found
+      at Request.params.callback [as _callback] (C:\Users\iamjc\AppData\Roaming\nvm\v16.13.0\node_modules\yarn\lib\cli.js:66145:18)
+      at Request.self.callback (C:\Users\iamjc\AppData\Roaming\nvm\v16.13.0\node_modules\yarn\lib\cli.js:140890:22)
+      at Request.emit (node:events:390:28)
+      at Request.<anonymous> (C:\Users\iamjc\AppData\Roaming\nvm\v16.13.0\node_modules\yarn\lib\cli.js:141862:10)
+      at Request.emit (node:events:390:28)
+      at IncomingMessage.<anonymous> (C:\Users\iamjc\AppData\Roaming\nvm\v16.13.0\node_modules\yarn\lib\cli.js:141784:12)
+      at Object.onceWrapper (node:events:509:28)
+      at IncomingMessage.emit (node:events:402:35)
+      at endReadableNT (node:internal/streams/readable:1343:12)
+      at processTicksAndRejections (node:internal/process/task_queues:83:21)
+
+npm manifest: 
+  {
+    "name": "light-bootstrap-dashboard-react",
+    "version": "2.0.1",
+    "dependencies": {
+      "@fortawesome/fontawesome-free": "5.15.2",
+      "@fortawesome/fontawesome-svg-core": "^6.4.2",
+      "@fortawesome/free-solid-svg-icons": "^6.4.2",
+      "@fortawesome/react-fontawesome": "^0.2.0",
+      "@hiveio/hive-js": "^2.0.4",
+      "assert": "^2.1.0",
+      "autoprefixer": "^10.4.16",
+      "axios": "^1.5.0",
+      "bootstrap": "4.6.0",
+      "buffer": "^6.0.3",
+      "chartist": "0.11.4",
+      "crypto-browserify": "^3.12.0",
+      "gulp": "4.0.2",
+      "gulp-append-prepend": "1.0.9",
+      "keychain-sdk": "^0.5.0",
+      "react": "18.2.0",
+      "react-app-rewired": "^2.2.1",
+      "react-bootstrap": "2.4.0",
+      "react-chartist": "0.14.4",
+      "react-dom": ">=16.8.0",
+      "react-notification-alert": "0.0.13",
+      "react-router": "5.2.0",
+      "react-router-dom": "^6.4.2",
+      "react-scripts": "5.0.1",
+      "reactstrap": "8.8.1",
+      "sass": "1.53.0",
+      "stream-browserify": "^3.0.0"
+    },
+    "optionalDependencies": {
+      "jquery": "3.5.1",
+      "typescript": "4.7.4"
+    },
+    "scripts": {
+      "start": "react-app-rewired start",
+      "build": "react-app-rewired build",
+      "test": "react-app-rewired test",
+      "eject": "react-app-rewired eject",
+      "install:clean": "rm -rf node_modules/ && rm -rf package-lock.json && npm install && npm start",
+      "compile:scss": "sass src/assets/scss/light-bootstrap-dashboard-pro-react.scss src/assets/css/light-bootstrap-dashboard-pro-react.css",
+      "minify:scss": "sass src/assets/scss/light-bootstrap-dashboard-pro-react.scss src/assets/css/light-bootstrap-dashboard-pro-react.min.css --style compressed",
+      "build:scss": "npm run compile:scss && npm run minify:scss"
+    },
+    "peerDependencies": {
+      "react": ">=16.8.0",
+      "react-dom": ">=16.8.0"
+    },
+    "browserslist": {
+      "production": [
+        ">0.2%",
+        "not dead",
+        "not op_mini all"
+      ],
+      "development": [
+        "last 1 chrome version",
+        "last 1 firefox version",
+        "last 1 safari version"
+      ]
+    },
+    "resolutions": {
+      "autoprefixer": "10.4.5"
+    },
+    "overrides": {
+      "autoprefixer": "10.4.5"
+    }
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile
