@@ -13,24 +13,24 @@ const LOGIN_REASON = 'Login using Hive';
 const authService = {
   login: async (username) => {
     try {
-      // const keychain = new KeychainSDK(window, { rpc: 'https://rpc.d.buzz/' });
+      const keychain = new KeychainSDK(window, { rpc: 'https://rpc.d.buzz/' });
 
-      // const isInstalled = await keychain.isKeychainInstalled();
+      const isInstalled = await keychain.isKeychainInstalled();
 
-      // if (!isInstalled) {
-      //   throw new Error('Hive Keychain not found');
-      // }
+      if (!isInstalled) {
+        throw new Error('Hive Keychain not found');
+      }
 
-      // const hiveUser = await keychain.login({
-      //   username: username,
-      //   message: LOGIN_REASON,
-      //   method: POSTING_AUTHORITY,
-      //   title: "Auto Vote Login"
-      // });
+      const hiveUser = await keychain.login({
+        username: username,
+        message: LOGIN_REASON,
+        method: POSTING_AUTHORITY,
+        title: "Auto Vote Login"
+      });
 
-      // if (!hiveUser?.success) {
-      //   throw new Error('Something went wrong');
-      // }
+      if (!hiveUser?.success) {
+        throw new Error('Something went wrong');
+      }
 
       const login = await axios.post(LOGIN_URL, {username})
 
@@ -39,7 +39,7 @@ const authService = {
       let data = {
         username,
         accessToken,
-        hiveUser: [],
+        hiveUser,
         userData: login?.data?.data?.user || [],
       };
 
@@ -67,8 +67,10 @@ const authService = {
         }
       );
 
-      localStorage.removeItem("user");
       // Handle the logout response if needed
+      if (response) {
+        localStorage.removeItem("user");
+      }
     } catch (error) {
       throw error;
     }

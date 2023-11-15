@@ -64,12 +64,13 @@ const AutoVote = () => {
           if (!hasVoted) {
             // await votePost(postAuthor, postPermlink, weight);
 
-            console.log({
-              username,
-              author: postAuthor,
-              permlink: postPermlink,
-              weight: weight,
-            });
+            // console.log({
+            //   username,
+            //   author: postAuthor,
+            //   permlink: postPermlink,
+            //   weight: weight,
+            // });
+            
             // use this from hive keychain
             await keychain.vote({
               username,
@@ -83,6 +84,16 @@ const AutoVote = () => {
         console.error('Error fetching account history:', err);
       }
     };
+
+    function votePost(author, permlink, weight) {
+      hive.broadcast.vote(voterPrivateKey, voterAccount, author, permlink, weight, (err, result) => {
+        if (err) {
+          console.error('Error voting:', err);
+        } else {
+          console.log(`Successfully voted for post by ${author} with permlink ${permlink} and weight ${weight}`);
+        }
+      });
+    }
 
     // Start watching for votes
     watchAccount();

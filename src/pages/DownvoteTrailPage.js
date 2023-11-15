@@ -4,6 +4,7 @@ import { postRequest } from 'api/axios/instance';
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { popular, following } from 'slices/downvote';
+import SearchBar from 'components/Search/SearchBar';
 
 const DownvoteTrailPage = () => {
   const dispatch = useDispatch();
@@ -102,12 +103,7 @@ const DownvoteTrailPage = () => {
     <Container fluid>
       <Row>
         <Col md="12">
-          <InputGroup className="mb-3">
-            <Form.Control style={{ height: '44px' }} placeholder="Find a @username" />
-            <Button variant="outline-secondary" id="button-addon2">
-              Button
-            </Button>
-          </InputGroup>
+          <SearchBar type="downvote" />
         </Col>
         <Col md="12">
           <Card className="strpied-tabled-with-hover">

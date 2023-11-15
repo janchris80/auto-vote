@@ -18,7 +18,6 @@ export default function SchedulePostPage() {
   const [data, setData] = useState([]);
   const [username, setUsername] = useState([]);
   const { user } = useSelector((state) => state.auth);
-  console.log(user.username);
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -29,8 +28,6 @@ export default function SchedulePostPage() {
   const [auther, setAuthor] = useState('');
   const [allowVotes, setAllowVotes] = useState(false);
   const [allowCurationRewards, setAllowCurationRewards] = useState(false);
-
-  const loginData = JSON.parse(localStorage.getItem('login'))
 
   useEffect(() => {
     setUsername(user.username)
@@ -54,7 +51,7 @@ export default function SchedulePostPage() {
           permlink: permalink,
           comment_options: JSON.stringify(
             {
-              "author": loginData?.data?.username,
+              "author": username,
               "permlink": permalink,
               "max_accepted_payout": "10000.000 HBD",
               "allow_votes": true,

@@ -5,7 +5,7 @@ const type = 'curation';
 
 export const popular = createAsyncThunk(
   "curations/popular",
-  async ({ page }) => {
+  async ({ page }, thunkAPI) => {
     try {
       const { data } = await followerService.popular(page, type);
       console.log('curations/popular', data);
@@ -30,7 +30,7 @@ export const popular = createAsyncThunk(
 
 export const following = createAsyncThunk(
   "curations/following",
-  async ({ page }) => {
+  async ({ page }, thunkAPI) => {
     try {
       const { data } = await followerService.following(page, type);
       console.log('curations/following', data);
@@ -67,28 +67,29 @@ const initialState = {
 const slice = createSlice({
   name: "curations",
   initialState,
-  extraReducers: {
-    [popular.fulfilled]: (state, action) => {
-      state.popularCurations = action.payload.popularCurations;
-      state.popularCurrentPage = action.payload.popularCurrentPage;
-      state.popularTotalPages = action.payload.popularTotalPages;
-    },
-    [popular.rejected]: (state, action) => {
-      state.popularCurations = [];
-      state.popularCurrentPage = 1;
-      state.popularTotalPages = 1;
-    },
-
-    [following.fulfilled]: (state, action) => {
-      state.followingCurations = action.payload.followingCurations;
-      state.followingCurrentPage = action.payload.followingCurrentPage;
-      state.followingTotalPages = action.payload.followingTotalPages;
-    },
-    [following.rejected]: (state, action) => {
-      state.followingCurations = [];
-      state.followingCurrentPage = 1;
-      state.followingTotalPages = 1;
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(popular.fulfilled, (state, action) => {
+        state.popularCurations = action.payload.popularCurations;
+        state.popularCurrentPage = action.payload.popularCurrentPage;
+        state.popularTotalPages = action.payload.popularTotalPages;
+      })
+      .addCase(popular.rejected, (state, action) => {
+        state.popularCurations = [];
+        state.popularCurrentPage = 1;
+        state.popularTotalPages = 1;
+      })
+      .addCase(following.fulfilled, (state, action) => {
+        state.followingCurations = action.payload.followingCurations;
+        state.followingCurrentPage = action.payload.followingCurrentPage;
+        state.followingTotalPages = action.payload.followingTotalPages;
+      })
+      .addCase(following.rejected, (state, action) => {
+        state.followingCurations = [];
+        state.followingCurrentPage = 1;
+        state.followingTotalPages = 1;
+      });
   },
 });
 

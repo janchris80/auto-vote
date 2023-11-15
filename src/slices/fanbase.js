@@ -5,7 +5,7 @@ const type = 'fanbase';
 
 export const popular = createAsyncThunk(
   "fans/popular",
-  async ({ page }) => {
+  async ({ page }, thunkAPI) => {
     try {
       const { data } = await followerService.popular(page, type);
       console.log('fans/popular', data);
@@ -30,7 +30,7 @@ export const popular = createAsyncThunk(
 
 export const following = createAsyncThunk(
   "fans/following",
-  async ({ page }) => {
+  async ({ page }, thunkAPI) => {
     try {
       const { data } = await followerService.following(page, type);
       console.log('fans/following', data);
@@ -67,28 +67,29 @@ const initialState = {
 const slice = createSlice({
   name: "fanbase",
   initialState,
-  extraReducers: {
-    [popular.fulfilled]: (state, action) => {
-      state.popularFanbase = action.payload.popularFanbase;
-      state.popularCurrentPage = action.payload.popularCurrentPage;
-      state.popularTotalPages = action.payload.popularTotalPages;
-    },
-    [popular.rejected]: (state, action) => {
-      state.popularFanbase = [];
-      state.popularCurrentPage = 1;
-      state.popularTotalPages = 1;
-    },
-
-    [following.fulfilled]: (state, action) => {
-      state.followingFanbase = action.payload.followingFanbase;
-      state.followingCurrentPage = action.payload.followingCurrentPage;
-      state.followingTotalPages = action.payload.followingTotalPages;
-    },
-    [following.rejected]: (state, action) => {
-      state.followingFanbase = [];
-      state.followingCurrentPage = 1;
-      state.followingTotalPages = 1;
-    },
+  reducers: {},
+  extraReducers: (builder) => {
+    builder
+      .addCase(popular.fulfilled, (state, action) => {
+        state.popularFanbase = action.payload.popularFanbase;
+        state.popularCurrentPage = action.payload.popularCurrentPage;
+        state.popularTotalPages = action.payload.popularTotalPages;
+      })
+      .addCase(popular.rejected, (state, action) => {
+        state.popularFanbase = [];
+        state.popularCurrentPage = 1;
+        state.popularTotalPages = 1;
+      })
+      .addCase(following.fulfilled, (state, action) => {
+        state.followingFanbase = action.payload.followingFanbase;
+        state.followingCurrentPage = action.payload.followingCurrentPage;
+        state.followingTotalPages = action.payload.followingTotalPages;
+      })
+      .addCase(following.rejected, (state, action) => {
+        state.followingFanbase = [];
+        state.followingCurrentPage = 1;
+        state.followingTotalPages = 1;
+      });
   },
 });
 

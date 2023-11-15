@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom/client";
 
+if (process.env.NODE_ENV !== 'production') {
+  // Only load dotenv in non-production environments
+  // require('dotenv').config();
+}
+
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import "bootstrap/dist/css/bootstrap.min.css";

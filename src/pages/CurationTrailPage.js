@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Table, Button, Row, Card, Col, Pagination, InputGroup, Form, Spinner } from 'react-bootstrap';
-import axios, { postRequest } from 'api/axios/instance';
+import { postRequest } from 'api/axios/instance';
 import { NavLink } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { popular, following } from 'slices/curation';
+import SearchBar from 'components/Search/SearchBar';
 
 const CurationTrailPage = () => {
   const dispatch = useDispatch();
@@ -102,12 +103,7 @@ const CurationTrailPage = () => {
     <Container fluid>
       <Row>
         <Col md="12">
-          <InputGroup className="mb-3">
-            <Form.Control style={{ height: '44px' }} placeholder="Find a @username" />
-            <Button variant="outline-secondary" id="button-addon2">
-              Button
-            </Button>
-          </InputGroup>
+          <SearchBar type="curation" />
         </Col>
         <Col md="12">
           <Card className="strpied-tabled-with-hover">
