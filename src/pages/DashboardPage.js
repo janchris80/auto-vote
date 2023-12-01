@@ -77,22 +77,20 @@ export default function DashboardPage() {
 
       handleSettings();
 
+      if (parseFloat(votingPower) < parseFloat(limitPower)) {
+        setUpvotingStatus('Paused');
+        setUpvotingStatusColor('danger');
+        setPaused(true)
+      } else {
+        setUpvotingStatus('Normal');
+        setUpvotingStatusColor('success');
+        setPaused(false)
+      }
+
       setLimitPower(user?.limitPower)
 
     }
-  }, [user, limitPower, isAuthorizeApp]);
-
-  useEffect(() => {
-    if (parseFloat(votingPower) < parseFloat(limitPower)) {
-      setUpvotingStatus('Paused');
-      setUpvotingStatusColor('danger');
-      setPaused(true)
-    } else {
-      setUpvotingStatus('Normal');
-      setUpvotingStatusColor('success');
-      setPaused(false)
-    }
-  }, [votingPower])
+  }, [user, limitPower, isAuthorizeApp, votingPower]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
@@ -187,15 +185,16 @@ export default function DashboardPage() {
                     <h4 style={{ borderBottom: '1px solid #000', paddingBottom: '10px' }}>Settings</h4>
                   </center>
                   <h5 className='font-weight-bold'>
-                    Upvoting status: <span className={`text-${upvotingStatusColor}`}>{upvotingStatus}</span>
+                    Upvoting status:
+                    {!loading ? <span className={`text-${upvotingStatusColor} ml-1`}>{upvotingStatus}</span> : 'Loading...'}
                   </h5>
                   <h5 className='font-weight-bold'>
-                    Current Mana: {votingPower}%
+                    Current Mana: {!loading ? `${votingPower}%` : 'Loading...'}
                   </h5>
                   <h5 className='font-weight-bold mx-auto'>
                     Limit on Mana:
-                    <span> {limitPower}%
-                      <Button size='sm' variant="Link" onClick={() => setPowerLimit(!powerLimit)}>
+                    <span> {!loading ? `${limitPower}%` : 'Loading...'}
+                      <Button size='sm' variant="Link" className='ml-1' onClick={() => setPowerLimit(!powerLimit)}>
                         (Click to edit)
                       </Button>
                     </span>
