@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { logout } from 'slices/auth';
 
 function Header() {
-  const { isLoggedIn } = useSelector((state) => state.auth);
+  const { user, isLoggedIn } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
   const mobileSidebarToggle = (e) => {
@@ -89,7 +89,7 @@ function Header() {
               isLoggedIn
                 ? (<Nav.Item>
                   <Nav.Link as={Link} onClick={handleLogout} className="m-0">
-                    Logout
+                    Logout ({user.username})
                   </Nav.Link>
                 </Nav.Item>)
                 : ''

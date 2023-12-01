@@ -18,11 +18,11 @@ export default function DashboardPage() {
   const [authorizeAccount, setAuthorizeAccount] = useState('');
   const [upvotingStatus, setUpvotingStatus] = useState('Normal');
   const [upvotingStatusColor, setUpvotingStatusColor] = useState('success');
-  const [votingPower, setVotingPower] = useState(0.00);
+  const [currentPower, setCurrentPower] = useState(0.00);
   const [powerLimit, setPowerLimit] = useState(false);
   const [limitPower, setLimitPower] = useState(100);
   const [updateLimitPower, setUpdateLimitPower] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const [paused, setPaused] = useState(true);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
@@ -66,7 +66,7 @@ export default function DashboardPage() {
 
             let percent = (percentage / 100).toFixed(2)
 
-            setVotingPower(percent);
+            setCurrentPower(percent);
           }
         } catch (error) {
           console.error('Error making the request:', error);
@@ -77,7 +77,7 @@ export default function DashboardPage() {
 
       handleSettings();
 
-      if (parseFloat(votingPower) < parseFloat(limitPower)) {
+      if (parseFloat(currentPower) < parseFloat(limitPower)) {
         setUpvotingStatus('Paused');
         setUpvotingStatusColor('danger');
         setPaused(true)
@@ -90,16 +90,16 @@ export default function DashboardPage() {
       setLimitPower(user?.limitPower)
 
     }
-  }, [user, limitPower, isAuthorizeApp, votingPower]);
+  }, [user, limitPower, isAuthorizeApp, currentPower]);
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
       if (window.confirm('Are you sure?')) {
         dispatch(updateUser({
-          currentPower: parseFloat(votingPower),
+          currentPower: parseFloat(currentPower),
           limitPower: parseFloat(updateLimitPower),
-          paused
+          paused: paused
         }))
         setPowerLimit(false);
       }
@@ -189,7 +189,7 @@ export default function DashboardPage() {
                     {!loading ? <span className={`text-${upvotingStatusColor} ml-1`}>{upvotingStatus}</span> : 'Loading...'}
                   </h5>
                   <h5 className='font-weight-bold'>
-                    Current Mana: {!loading ? `${votingPower}%` : 'Loading...'}
+                    Current Mana: {!loading ? `${currentPower}%` : 'Loading...'}
                   </h5>
                   <h5 className='font-weight-bold mx-auto'>
                     Limit on Mana:
@@ -207,7 +207,7 @@ export default function DashboardPage() {
                         name="powerlimit"
                         type="number"
                         min="1"
-                        max="99"
+                        max="99.99"
                         step="0.01"
                         value={updateLimitPower}
                         onChange={(e) => handleSetUpdateLimitPower(e)}

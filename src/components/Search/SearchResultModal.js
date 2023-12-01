@@ -1,9 +1,21 @@
 // Search/SearchResultModal.js
 import { useEffect, useState } from 'react';
-import { Button, Modal, Row, Col, Image, Card } from 'react-bootstrap';
+import { Button, Modal, Row, Col, Image, Card, Container } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
 const SearchResultModal = ({ show, handleClose, user }) => {
+  const [jsonMetadata, setJsonMetadata] = useState({});
+  const [hiveUser, setHiveUser] = useState({});
+  const [webUser, setWebUser] = useState({});
+
+  useEffect(() => {
+    if (user) {
+      const parser = JSON.parse(user?.hive_user?.json_metadata);
+      setJsonMetadata(parser);
+      setHiveUser(user?.hive_user);
+      setWebUser(user?.user);
+    }
+  }, [show, user])
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -14,20 +26,48 @@ const SearchResultModal = ({ show, handleClose, user }) => {
       <Modal.Body>
         <Card>
           {/* <Card.Img variant="top" src="holder.js/100px180" /> */}
-          <Card.Header as="h3">{`@${user?.name}` || user}</Card.Header>
+          <Card.Header as="h3">{`@${hiveUser?.name}`}</Card.Header>
           <Card.Body>
             <Card.Title className='mb-2'>
               Website:
-              <Link to={user?.json_metadata?.profile?.website} target='_blank'>
-                {user?.json_metadata?.profile?.website}
+              <Link to={jsonMetadata?.profile?.website} target='_blank'>
+                {jsonMetadata?.profile?.website}
               </Link>
             </Card.Title>
-            <Card.Subtitle className="mb-2 text-muted">{user?.json_metadata?.profile?.about}</Card.Subtitle>
+            <Card.Subtitle className="mb-2 text-muted">{jsonMetadata?.profile?.about}</Card.Subtitle>
             <Card.Text>
-              {/* <img src={user.json_metadata.profile.cover_image} /> */}
-              {/* <img src={user.json_metadata.profile.profile_image} /> */}
-              Post Count: {user?.post_count || 0}
-              {/* <p>Follower: {user?.post_count}</p> */}
+              <p>Post Count: {hiveUser?.post_count || 0}</p>
+              <p>Followed: {hiveUser?.post_count || 0}</p>
+              <div>
+                <Row className=''>
+                  <Col>
+                    <p>
+                      Has Curation Trail: {webUser.curation_trailer ? 'Yes' : 'No'}
+                    </p>
+                  </Col>
+                  <Col>
+                    {
+                      webUser.curation_trailer
+                        ? <Button size='sm' variant='success'>Follow Trail</Button>
+                        : null
+                    }
+                  </Col>
+                </Row>
+
+                <Row className=''>
+                  <Col>
+                    <p>Has Downvote Trail: {webUser.downvote_trailer ? 'Yes' : 'No'}</p>
+                  </Col>
+                  <Col>
+                    {
+                      webUser.downvote_trailer
+                        ? <Button size='sm' variant='success'>Follow Trail</Button>
+                        : null
+                    }
+                  </Col>
+                </Row>
+              </div>
+
             </Card.Text>
           </Card.Body>
         </Card>
@@ -37,9 +77,9 @@ const SearchResultModal = ({ show, handleClose, user }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        <Button as={Link} to={`/curation-trail/@${user?.name}`} variant="primary">
+        {/* <Button as={Link} to={`/curation-trail/@${user?.name}`} variant="primary">
           Go to Profile
-        </Button>
+        </Button> */}
       </Modal.Footer>
     </Modal>
   );

@@ -89,13 +89,16 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
 
           {/* Status Checkbox */}
           <div className="form-group">
-            <label className="mr-2">Status</label>
+            <label className="mr-2">Status: <span style={{ color: status ? 'green' : 'red' }}>
+              {status ? 'Enabled' : 'Disabled'}
+            </span>
+            </label>
             <Button
               size='sm'
-              variant={status ? 'success' : 'danger'}
+              variant={!status ? 'success' : 'danger'}
               onClick={() => toggleStatus()}
             >
-              {status ? 'Enable' : 'Disable'}
+              {!status ? 'Click to Enable' : 'Click to Disable'}
             </Button>
           </div>
 

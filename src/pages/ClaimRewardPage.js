@@ -45,29 +45,35 @@ const ClaimRewardPage = () => {
           <Col>
             <Card>
               <Card.Body>
-                <h3>Welcome {username},</h3>
-                <p>
-                  Here you can enable or disable {authorizeAccount} from automatically claiming your rewards.
-                  <br />
-                  <strong>More info:</strong> Usually you redeem your curation and author rewards by clicking on a button in your wallet on Hive Keychain Extension.
-                  <br />
-                  This handy tool means you don't need to click on that button manually, since it does that job for you automatically!
-                  <br />
-                  Every 15 minutes this tool will check your account and will transfer your pending rewards to your balance.
-                  <br />
-                  This tool is safe to use because {authorizeAccount} only has access to your posting authority. That means it can only claim your rewards and cannot access any of the funds in your wallet.
-                  <br /><br />
-                  <strong>Status:</strong>
-                  <span style={{ color: claimReward ? 'green' : 'red' }}>
-                    {claimReward ? 'Enabled' : 'Disabled'}
-                  </span>
-                  <br />
-                  {claimReward ? (
-                    <Button style={{ marginTop: '5px' }} variant="danger" onClick={handleDisable}>Click to Disable</Button>
-                  ) : (
-                    <Button style={{ marginTop: '5px' }} variant="success" onClick={handleEnable}>Click to Enable</Button>
-                  )}
-                </p>
+                <Row>
+                  <Col>
+                    <h3>Welcome {username},</h3>
+                    <p>Here you can enable or disable <strong>{authorizeAccount}</strong> from automatically claiming your rewards.</p>
+                    <p><strong>More info:</strong> Usually you redeem your curation and author rewards by clicking on a button in your wallet on Hive Keychain Extension.</p>
+                    <p>This handy tool means you don't need to click on that button manually, since it does that job for you automatically!</p>
+                    <p>Every 15 minutes this tool will check your account and will transfer your pending rewards to your balance.</p>
+                    <p>
+                      This tool is safe to use because <strong>{authorizeAccount}</strong> only has access to your posting authority. That means it can only claim your rewards and cannot access any of the funds in your wallet.
+                    </p>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    <strong>Status:</strong>
+                    <span style={{ color: claimReward ? 'green' : 'red' }}>
+                      {claimReward ? 'Enabled' : 'Disabled'}
+                    </span>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col>
+                    {claimReward ? (
+                      <Button style={{ marginTop: '5px' }} variant="danger" onClick={handleDisable}>Click to Disable</Button>
+                    ) : (
+                      <Button style={{ marginTop: '5px' }} variant="success" onClick={handleEnable}>Click to Enable</Button>
+                    )}
+                  </Col>
+                </Row>
               </Card.Body>
             </Card>
           </Col>

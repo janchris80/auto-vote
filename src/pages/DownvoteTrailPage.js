@@ -8,6 +8,7 @@ import instance from 'api/axios/instance';
 import { updateTrailer } from 'slices/trailer';
 import FollowingSetting from 'components/common/FollowingSetting';
 import { usePopularTrailers, useFollowingTrails, useCreateTrailer, useGetTrailer } from 'hooks/useTrailer';
+import followerService from 'api/services/followerService';
 
 
 const DownvoteTrailPage = () => {
@@ -21,6 +22,7 @@ const DownvoteTrailPage = () => {
     popularTotalPages,
     downvote,
   } = useSelector((state) => state.trailer);
+  const { user } = useSelector((state) => state.auth);
 
   const userRef = useRef();
   const errRef = useRef();
@@ -31,6 +33,7 @@ const DownvoteTrailPage = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [title, setTitle] = useState('Create Trail');
   const [loadingFollow, setLoadingFollow] = useState(false);
+  const [loadingStates, setLoadingStates] = useState({});
   const [error, setError] = useState(null);
   const [description, setDescription] = useState('');
   const [id, setId] = useState('');
@@ -38,6 +41,7 @@ const DownvoteTrailPage = () => {
   const [validated, setValidated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [trailer, setTrailer] = useState(null);
+  const [username, setUsername] = useState('');
 
   const { popularPage, setPopularPage, refreshPopularTrails } = usePopularTrailers(type);
   const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(type);
@@ -48,6 +52,12 @@ const DownvoteTrailPage = () => {
   const handleShow = () => setShow(true);
   const handleCloseSetting = () => setShowSettings(false);
   const handleShowSetting = () => setShowSettings(true);
+
+  useEffect(() => {
+    if (user) {
+      setUsername(user.username)
+    }
+  }, [user])
 
   useEffect(() => {
     // Check if followingTrailers has changed
@@ -82,18 +92,43 @@ const DownvoteTrailPage = () => {
 
   const handlePageChange = (page, handlePage) => handlePage(page)
 
-  const handleFollow = async (userId, follow = true) => {
-    const action = follow ? 'unfollow' : 'follow';
-
+  const handleFollow = async (userId) => {
     try {
-      setLoadingFollow(true);
+      setLoadingStates((prevLoadingStates) => ({
+        ...prevLoadingStates,
+        [userId]: true,
+      }));
 
-      // await followerService.follow(action, userId, trailType);
-      // await fetchTrails();
+      await followerService.follow(userId, type);
+      await refreshFollowingTrails();
+      await refreshPopularTrails();
     } catch (error) {
       console.error(error);
     } finally {
-      setLoadingFollow(false);
+      setLoadingStates((prevLoadingStates) => ({
+        ...prevLoadingStates,
+        [userId]: false,
+      }));
+    }
+  };
+
+  const handleUnfollow = async (userId) => {
+    try {
+      setLoadingStates((prevLoadingStates) => ({
+        ...prevLoadingStates,
+        [userId]: true,
+      }));
+
+      await followerService.unfollow(userId, type);
+      await refreshFollowingTrails();
+      await refreshPopularTrails();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoadingStates((prevLoadingStates) => ({
+        ...prevLoadingStates,
+        [userId]: false,
+      }));
     }
   };
 
@@ -129,6 +164,7 @@ const DownvoteTrailPage = () => {
       handleCreate(event);
     }
 
+    refreshPopularTrails();
     handleClose();
   };
 
@@ -231,45 +267,51 @@ const DownvoteTrailPage = () => {
                   </thead>
                   <tbody>
                     {followingTrailers.length !== 0 ? (
-                      followingTrailers?.map((followingTrailer, index) => (
-                        <tr key={index}>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                          <td>{index + 1 + (followingCurrentPage - 1) * 10}</td>
-                          <td>
-                            <Link to={`/downvote-trail/@${followingTrailer.username}`}>
-                              @{followingTrailer.username}
-                            </Link>
-                          </td>
-                          <td>{followingTrailer.followersCount}</td>
-                          <td>{followingTrailer.weight}</td>
-                          <td className='text-capitalize'>{followingTrailer.method}</td>
-                          <td>{followingTrailer.waitTime}</td>
-                          <td>
-                            {
-                              followingTrailer.status
-                                ? <Badge bg='success'>Enable</Badge>
-                                : <Badge bg='danger'>Disable</Badge>
-                            }
-                          </td>
-                          <td className=''>
-                            {/* Show loading spinner when loadingFollow is true */}
-                            {loadingFollow ? (
-                              <Spinner size='sm' animation="border" role="status">
-                                <span className="sr-only">Loading...</span>
-                              </Spinner>
-                            ) : (
-                              <>
-                                <Button size="sm" onClick={() => handleSettings(followingTrailer)}>Settings</Button>
-                                <Button size="sm" variant='danger' onClick={() => handleFollow()} disabled={loadingFollow} >
-                                  Remove
-                                </Button>
-                              </>
-                            )}
-                          </td>
-                        </tr>
-                      ))
+                      followingTrailers?.map((followingTrailer, index) => {
+                        return (
+                          <tr key={index}>
+                            <td>
+                              <input type="checkbox" />
+                            </td>
+                            <td>{index + 1 + (followingCurrentPage - 1) * 10}</td>
+                            <td>
+                              <Link to={`/downvote-trail/@${followingTrailer.username}`}>
+                                @{followingTrailer.username}
+                              </Link>
+                            </td>
+                            <td>{followingTrailer.followersCount}</td>
+                            <td>{followingTrailer.weight}</td>
+                            <td className='text-capitalize'>{followingTrailer.method}</td>
+                            <td>{followingTrailer.waitTime}</td>
+                            <td>
+                              {
+                                followingTrailer.status
+                                  ? <Badge bg='success'>Enable</Badge>
+                                  : <Badge bg='danger'>Disable</Badge>
+                              }
+                            </td>
+                            <td className=''>
+                              {/* Show loading spinner when loadingFollow is true */}
+                              {loadingFollow ? (
+                                <Spinner size='sm' animation="border" role="status">
+                                  <span className="sr-only">Loading...</span>
+                                </Spinner>
+                              ) : (
+                                <>
+                                  <Button size="sm" onClick={() => handleSettings(followingTrailer)}>Settings</Button>
+                                  <Button
+                                    size="sm"
+                                    variant='danger'
+                                    onClick={() => handleUnfollow(followingTrailer.userId)} disabled={loadingFollow}
+                                  >
+                                    {loadingStates[followingTrailer.userId] ? 'Removing...' : 'Remove'}
+                                  </Button>
+                                </>
+                              )}
+                            </td>
+                          </tr>
+                        )
+                      })
                     ) : (
                       <tr>
                         <td colSpan={9} style={{ textAlign: 'center' }}>
@@ -345,13 +387,15 @@ const DownvoteTrailPage = () => {
                           <td>{popularTrailer.followersCount}</td>
                           <td>
                             {
-                              popularTrailer.isFollowed
-                                ? <Button size='sm' variant='danger'>
-                                  Unfollow
-                                </Button>
-                                : <Button size='sm' variant='success'>
-                                  Follow
-                                </Button>
+                              popularTrailer.username !== username
+                                ? popularTrailer.isFollowed
+                                  ? <Button size='sm' variant='danger' onClick={() => handleUnfollow(popularTrailer.userId)}>
+                                    {loadingStates[popularTrailer.userId] ? 'Unfollowing...' : 'Unfollow'}
+                                  </Button>
+                                  : <Button size='sm' variant='success' onClick={() => handleFollow(popularTrailer.userId)}>
+                                    {loadingStates[popularTrailer.userId] ? 'Following...' : 'Follow'}
+                                  </Button>
+                                : <Button size='sm' disabled variant='danger' className='text-black'>Cant follow yourself</Button>
                             }
                           </td>
                         </tr>

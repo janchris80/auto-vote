@@ -12,19 +12,21 @@ const SearchBar = ({ type }) => {
   const [loading, setLoading] = useState(false); // New loading state
 
   const handleSearch = async () => {
-    setLoading(true); // Set loading to true when starting the search
+    if (searchUsername) {
+      setLoading(true); // Set loading to true when starting the search
 
-    try {
-      const result = await hiveService.searchUsername(searchUsername);
-      const user = result?.data?.data;
+      try {
+        const result = await hiveService.searchUsername(searchUsername);
+        const user = result?.data?.data;
 
-      console.log(user);
-      setSearchResult(user);
-      setShowModal(true);
-    } catch (error) {
-      console.error('Error making the request:', error);
-    } finally {
-      setLoading(false); // Set loading to false when the search is complete
+        console.log(user);
+        setSearchResult(user);
+        setShowModal(true);
+      } catch (error) {
+        console.error('Error making the request:', error);
+      } finally {
+        setLoading(false); // Set loading to false when the search is complete
+      }
     }
   };
 
