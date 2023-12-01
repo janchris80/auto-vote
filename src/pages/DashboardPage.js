@@ -103,6 +103,7 @@ export default function DashboardPage() {
           limitPower: parseFloat(updateLimitPower),
           paused
         }))
+        setPowerLimit(false);
       }
     } catch (error) {
       console.error(error);
