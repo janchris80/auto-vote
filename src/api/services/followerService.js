@@ -1,24 +1,43 @@
-import { postRequest, getRequest } from '../axios/instance';
+import { postRequest } from '../axios/instance';
 
 const followerService = {
-  popular: async (page, type) => {
-    try {
-      const response = await postRequest(`/api/popular?page=${page}`, { type })
-
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  getPopular: (page, type) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await postRequest(`/api/popular?page=${page}`, { type });
+        resolve(response);
+      } catch (error) {
+        console.error('Error in popular service:', error);
+        reject(new Error('Failed to fetch popular data'));
+      }
+    });
   },
 
-  following: async (page, type) => {
-    try {
-      const response = await postRequest(`/api/following?page=${page}`, { type })
+  getFollowing: (page, type) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await postRequest(`/api/following?page=${page}`, { type });
+        resolve(response);
+      } catch (error) {
+        console.error('Error in following service:', error);
+        reject(new Error('Failed to fetch following data'));
+      }
+    });
+  },
 
-      return response;
-    } catch (error) {
-      throw error;
-    }
+  follow: (action, userId, trailType) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const response = await postRequest(`/api/followers/${action}`, {
+          user_id: userId,
+          type: trailType, // 'curation' or 'downvote'
+        });
+        resolve(response);
+      } catch (error) {
+        console.error('Error in follow service:', error);
+        reject(new Error('Failed to perform follow action'));
+      }
+    });
   },
 };
 

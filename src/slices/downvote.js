@@ -7,7 +7,7 @@ export const popular = createAsyncThunk(
   "downvotes/popular",
   async ({ page }, thunkAPI) => {
     try {
-      const { data } = await followerService.popular(page, type);
+      const { data } = await followerService.getPopular(page, type);
       console.log('downvotes/popular', data);
 
       return {
@@ -32,7 +32,7 @@ export const following = createAsyncThunk(
   "downvotes/following",
   async ({ page }, thunkAPI) => {
     try {
-      const { data } = await followerService.following(page, type);
+      const { data } = await followerService.getFollowing(page, type);
       console.log('downvotes/following', data);
 
       return {

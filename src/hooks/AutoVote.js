@@ -11,29 +11,29 @@ const AutoVote = () => {
   // const voterAccount = ''; // Account which will cast votes
   // const voterPrivateKey = ''; // Private posting key of the account you want to vote with
 
+  hive.api.setOptions({ url: 'https://rpc.d.buzz/' });
+  hive.config.set('alternative_api_endpoints', [
+    'https://api.hive.blog',
+    'https://rpc.ecency.com/',
+    'https://hive-api.3speak.tv/',
+    'https://hived.privex.io',
+    'https://anyx.io',
+    'https://api.deathwing.me',
+    'https://hived.emre.sh',
+    'https://hive-api.arcange.eu',
+    'https://api.openhive.network',
+    'https://techcoderx.com',
+    'https://hive.roelandp.nl',
+    'https://api.c0ff33a.uk',
+  ]);
+
+
   useEffect(() => {
     // Connect to a Hive node
-    hive.api.setOptions({ url: 'https://rpc.d.buzz/' });
-    hive.config.set('alternative_api_endpoints', [
-      'https://api.hive.blog',
-      'https://rpc.ecency.com/',
-      'https://hive-api.3speak.tv/',
-      'https://hived.privex.io',
-      'https://anyx.io',
-      'https://api.deathwing.me',
-      'https://hived.emre.sh',
-      'https://hive-api.arcange.eu',
-      'https://api.openhive.network',
-      'https://techcoderx.com',
-      'https://hive.roelandp.nl',
-      'https://api.c0ff33a.uk',
-    ]);
 
+    const keychain = new KeychainSDK(window, { rpc: 'https://rpc.d.buzz/' });
 
-    const keychain = new KeychainSDK(window);
-
-    console.log(keychain);
-
+    const [lastProcessedTxId, setLastProcessedTxId] = useState(-1);
     // Function to watch the account for votes
     const watchAccount = async () => {
       try {
@@ -57,6 +57,7 @@ const AutoVote = () => {
           const weight = voteOp[1].weight; // Capture the weight from the original vote
 
           // Check if our voter account has already voted on this post
+          // 100 request
           const votes = await hive.api.getActiveVotesAsync(postAuthor, postPermlink);
           console.log('votes', votes);
 
@@ -70,7 +71,7 @@ const AutoVote = () => {
             //   permlink: postPermlink,
             //   weight: weight,
             // });
-            
+
             // use this from hive keychain
             await keychain.vote({
               username,
@@ -85,15 +86,15 @@ const AutoVote = () => {
       }
     };
 
-    function votePost(author, permlink, weight) {
-      hive.broadcast.vote(voterPrivateKey, voterAccount, author, permlink, weight, (err, result) => {
-        if (err) {
-          console.error('Error voting:', err);
-        } else {
-          console.log(`Successfully voted for post by ${author} with permlink ${permlink} and weight ${weight}`);
-        }
-      });
-    }
+    // function votePost(author, permlink, weight) {
+    //   hive.broadcast.vote(voterPrivateKey, voterAccount, author, permlink, weight, (err, result) => {
+    //     if (err) {
+    //       console.error('Error voting:', err);
+    //     } else {
+    //       console.log(`Successfully voted for post by ${author} with permlink ${permlink} and weight ${weight}`);
+    //     }
+    //   });
+    // }
 
     // Start watching for votes
     watchAccount();

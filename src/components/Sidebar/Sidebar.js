@@ -1,7 +1,6 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Nav } from "react-bootstrap";
 import { routes } from '../../routes.js';
-import Link from './Link';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -15,7 +14,7 @@ export default function Sidebar() {
             to='/'
             className="simple-text font-weight-bold text-black"
           >
-            <span className='text-red'>Hive</span>Vote
+            <span className='text-red'>Auto</span>Vote
           </NavLink>
         </div>
         <Nav>
@@ -25,8 +24,12 @@ export default function Sidebar() {
               className={upgrade ? "active active-pro" : activeRoute(path)} >
               <NavLink
                 to={path}
-                className="nav-link text-black font-weight-light"
-                activeClass="active"
+                // className="nav-link text-black font-weight-light"
+                className={({ isActive }) =>
+                  isActive
+                    ? "nav-link text-black font-weight-light active"
+                    : "nav-link text-black font-weight-light"
+                }
               >
                 <i className={icon} />
                 <p>{name}</p>

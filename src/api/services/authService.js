@@ -1,7 +1,7 @@
 // api/services/authService.js
 
 import { KeychainSDK } from 'keychain-sdk';
-import axios from '../axios/instance';
+import axios, { getUserAccessToken } from '../axios/instance';
 
 const LOGIN_URL = '/api/login';
 const LOGOUT_URL = '/api/logout';
@@ -39,11 +39,8 @@ const authService = {
       let data = {
         username,
         accessToken,
-        hiveUser,
-        userData: login?.data?.data?.user || [],
+        ...login?.data?.data?.user
       };
-
-      localStorage.setItem("user", JSON.stringify(data));
 
       return data;
 
@@ -54,9 +51,7 @@ const authService = {
 
   logout: async () => {
     try {
-      // await axios.get('/sanctum/csrf-cookie')
-      const { accessToken } = JSON.parse(localStorage.getItem("user"));
-
+      const accessToken = getUserAccessToken();
       const response = await axios.post(
         LOGOUT_URL,
         {},
@@ -66,11 +61,6 @@ const authService = {
           },
         }
       );
-
-      // Handle the logout response if needed
-      if (response) {
-        localStorage.removeItem("user");
-      }
     } catch (error) {
       throw error;
     }

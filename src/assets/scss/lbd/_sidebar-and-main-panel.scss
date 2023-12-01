@@ -386,7 +386,7 @@ body > .navbar-collapse{
         .modal-dialog{
             -webkit-transform: translate(0, 30%);
             -o-transform: translate(0, 30%);
-            transform: translate(0, 30%);
+            transform: translate(0, 0%); // default 30
         }
     }
     &.modal-mini{

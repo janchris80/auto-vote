@@ -1,19 +1,28 @@
-import { configureStore } from '@reduxjs/toolkit'
+import { combineReducers, configureStore } from '@reduxjs/toolkit';
+import { persistStore, persistReducer } from 'redux-persist';
+import storage from 'redux-persist/lib/storage';
+import thunk from 'redux-thunk';
 import authReducer from 'slices/auth';
-import curationReducer from 'slices/curation';
-import downvoteReducer from 'slices/downvote';
-import fanbaseReducer from 'slices/fanbase';
+import trailerReducer from 'slices/trailer';
 
-const reducer = {
+const rootReducer = combineReducers({
   auth: authReducer,
-  curations: curationReducer,
-  fans: fanbaseReducer,
-  downvotes: downvoteReducer,
-}
-
-const store = configureStore({
-  reducer: reducer,
-  devTools: true,
+  trailer: trailerReducer,
 })
 
-export default store;
+const persistConfig = {
+  key: 'root',
+  storage,
+};
+
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+const store = configureStore({
+  reducer: persistedReducer,
+  devTools: process.env.NODE_ENV !== 'production',
+  middleware: [thunk]
+});
+
+const persistor = persistStore(store);
+
+export { store, persistor };

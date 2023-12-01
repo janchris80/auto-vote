@@ -37,6 +37,9 @@ const SearchResultModal = ({ show, handleClose, user }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
+        <Button as={Link} to={`/curation-trail/@${user?.name}`} variant="primary">
+          Go to Profile
+        </Button>
       </Modal.Footer>
     </Modal>
   );

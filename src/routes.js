@@ -1,9 +1,9 @@
 export const routes = [
-  {
-    path: '/home',
-    name: 'Home',
-    icon: 'pe-7s-home',
-  },
+  // {
+  //   path: '/home',
+  //   name: 'Home',
+  //   icon: 'pe-7s-home',
+  // },
   {
     path: '/dashboard',
     name: 'Dashboard',
@@ -24,11 +24,11 @@ export const routes = [
     name: 'Fanbase',
     icon: 'pe-7s-like',
   },
-  {
-    path: '/schedule-posts',
-    name: 'Schedule Posts',
-    icon: 'pe-7s-date',
-  },
+  // {
+  //   path: '/schedule-posts',
+  //   name: 'Schedule Posts',
+  //   icon: 'pe-7s-date',
+  // },
   {
     path: '/upvote-comments',
     name: 'Upvote Comments',
@@ -39,9 +39,9 @@ export const routes = [
     name: 'Claim Rewards',
     icon: 'pe-7s-wallet',
   },
-  {
-    path: '/notifications',
-    name: 'Notifications',
-    icon: 'pe-7s-bell',
-  },
+  // {
+  //   path: '/notifications',
+  //   name: 'Notifications',
+  //   icon: 'pe-7s-bell',
+  // },
 ];

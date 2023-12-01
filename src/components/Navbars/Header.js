@@ -41,7 +41,7 @@ function Header() {
             to="/"
             className="mr-2 font-weight-bold text-black"
           >
-            <span className='text-red'>Hive</span>Vote
+            <span className='text-red'>Auto</span>Vote
           </Navbar.Brand>
         </div>
         <Navbar.Toggle aria-controls="basic-navbar-nav" className="mr-2">
