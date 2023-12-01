@@ -1,7 +1,7 @@
 // api/services/authService.js
 
 import { KeychainSDK } from 'keychain-sdk';
-import axios, { getUserAccessToken } from '../axios/instance';
+import axios, { getUserAccessToken, postRequest } from '../axios/instance';
 
 const LOGIN_URL = '/api/login';
 const LOGOUT_URL = '/api/logout';
@@ -32,7 +32,7 @@ const authService = {
         throw new Error('Something went wrong');
       }
 
-      const login = await axios.post(LOGIN_URL, {username})
+      const login = await axios.post(LOGIN_URL, { username })
 
       const accessToken = login?.data?.data?.token;
 
@@ -71,6 +71,20 @@ const authService = {
       // await axios.get('/sanctum/csrf-cookie')
       const response = await axios.get(USER_INFO_URL);
       return response?.data?.data?.user;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  update: async (currentPower, limitPower, paused) => {
+    try {
+      const response = await postRequest(`/api/user/update`, {
+        current_power: currentPower,
+        limit_power: limitPower,
+        paused
+      })
+      let user = response?.data?.data;
+      return user;
     } catch (error) {
       throw error;
     }

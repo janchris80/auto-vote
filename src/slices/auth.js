@@ -34,10 +34,32 @@ const authSlice = createSlice({
     setAccessToken: (state, action) => {
       state.accessToken = action.payload.accessToken;
     },
+    updateUser: (state, action) => {
+      state.user = action.payload.user;
+    },
   },
 });
 
-export const { loginSuccess, loginFailure, logoutSuccess, updateAuthorizeStatus, setAccessToken } = authSlice.actions;
+export const { loginSuccess, loginFailure, logoutSuccess, updateAuthorizeStatus, setAccessToken, updateUser } = authSlice.actions;
+
+export const update = ({ currentPower, limitPower, paused }) => async (dispatch) => {
+  try {
+    const response = await authService.update(currentPower, limitPower, paused);
+
+    console.log(response);
+    dispatch(updateUser({user: response}));
+
+  } catch (error) {
+    const message =
+      (error.response &&
+        error.response.data &&
+        error.response.data.message) ||
+      error.message ||
+      error.toString();
+    console.error(message);
+    // dispatch();
+  }
+};
 
 export const login = ({ username }) => async (dispatch) => {
   try {

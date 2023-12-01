@@ -9,6 +9,7 @@ import {
   Form,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from 'react-redux';
+import { update as updateUser } from 'slices/auth';
 import { removeAccountAuthority, addAccountAuthority } from 'slices/auth';
 
 export default function DashboardPage() {
@@ -18,13 +19,16 @@ export default function DashboardPage() {
   const [upvotingStatus, setUpvotingStatus] = useState('Normal');
   const [upvotingStatusColor, setUpvotingStatusColor] = useState('success');
   const [votingPower, setVotingPower] = useState(0.00);
-  const [powerLimit, setPowerLimit] = useState(100);
+  const [powerLimit, setPowerLimit] = useState(false);
+  const [limitPower, setLimitPower] = useState(100);
+  const [updateLimitPower, setUpdateLimitPower] = useState(0);
+  const [paused, setPaused] = useState(false);
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
 
   useEffect(() => {
     setUsername(user?.username);
-    setAuthorizeAccount(user?.userData?.authorizeAccount);
+    setAuthorizeAccount(user?.authorizeAccount);
   }, [user]);
 
   // only run if isAuthorizeApp = 1, default is 0
@@ -73,24 +77,35 @@ export default function DashboardPage() {
 
       handleSettings();
 
-      setPowerLimit(user?.userData?.limitPower)
+      setLimitPower(user?.limitPower)
+
     }
-  }, [user, powerLimit, isAuthorizeApp]);
+  }, [user, limitPower, isAuthorizeApp]);
 
   useEffect(() => {
-    if (parseFloat(votingPower) < parseFloat(powerLimit)) {
+    if (parseFloat(votingPower) < parseFloat(limitPower)) {
       setUpvotingStatus('Paused');
       setUpvotingStatusColor('danger');
+      setPaused(true)
     } else {
       setUpvotingStatus('Normal');
       setUpvotingStatusColor('success');
+      setPaused(false)
     }
   }, [votingPower])
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (window.confirm('Are you sure?')) {
-      // Handle your form submission logic here
+    try {
+      if (window.confirm('Are you sure?')) {
+        dispatch(updateUser({
+          currentPower: parseFloat(votingPower),
+          limitPower: parseFloat(updateLimitPower),
+          paused
+        }))
+      }
+    } catch (error) {
+      console.error(error);
     }
   };
 
@@ -127,6 +142,8 @@ export default function DashboardPage() {
     }
   };
 
+  const handleSetUpdateLimitPower = (e) => setUpdateLimitPower(e.target.value);
+
   return (
     <Container fluid>
       <Row>
@@ -141,7 +158,7 @@ export default function DashboardPage() {
               <div className=''>
                 {isAuthorizeApp
                   ? <>
-                    <p>You can remove {authorizeAccount}'s access from your account by using Hive Keychain or you can click the button <strong>Unauthorize</strong>.</p>
+                    <p>You can remove <strong>{authorizeAccount}</strong>'s access from your account by using Hive Keychain (extension/mobile) or you can click the button <strong>Unauthorize</strong>.</p>
                     <Button variant='danger' onClick={() => handleRemoveAuthority()}>
                       Unauthorize (Leave {authorizeAccount})
                     </Button>
@@ -176,13 +193,13 @@ export default function DashboardPage() {
                   </h5>
                   <h5 className='font-weight-bold mx-auto'>
                     Limit on Mana:
-                    <span> {powerLimit}%
-                      {/* <Button size='sm' variant="Link" onClick={() => setPowerLimit(!powerLimit)}>
+                    <span> {limitPower}%
+                      <Button size='sm' variant="Link" onClick={() => setPowerLimit(!powerLimit)}>
                         (Click to edit)
-                      </Button> */}
+                      </Button>
                     </span>
                   </h5>
-                  {/* <Form onSubmit={handleFormSubmit} style={{ display: powerLimit ? 'block' : 'none' }}>
+                  <Form onSubmit={handleFormSubmit} style={{ display: powerLimit ? 'block' : 'none' }}>
                     <Form.Group>
                       <Form.Label htmlFor="powerlimit">Mana limitation (%):</Form.Label>
                       <Form.Control
@@ -192,15 +209,15 @@ export default function DashboardPage() {
                         min="1"
                         max="99"
                         step="0.01"
-                        value={powerLimit}
-                        onChange={(e) => setPowerLimit(e.target.value)}
+                        value={updateLimitPower}
+                        onChange={(e) => handleSetUpdateLimitPower(e)}
                         required
                       />
                     </Form.Group>
                     <Button type="submit" style={{ marginTop: '5px' }} variant="primary">
                       Submit
                     </Button>
-                  </Form> */}
+                  </Form>
                   <br />
                   <p>All your upvotes will be paused if your Mana is lower than the Mana limitation.</p>
                   <p>Read more about Mana in the Steemit FAQ.</p>
