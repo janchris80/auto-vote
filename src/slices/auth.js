@@ -14,9 +14,6 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    resetState: (state, action) => {
-      return initialState;
-    },
     loginSuccess: (state, action) => {
       state.isLoggedIn = true;
       state.user = action.payload.user;
@@ -122,7 +119,6 @@ export const removeAccountAuthority = ({ username, authorizeAccount }) => async 
 export const logout = () => async (dispatch) => {
   await authService.logout();
   dispatch(logoutSuccess());
-  dispatch(resetState());
 };
 
 const authReducer = authSlice.reducer;
