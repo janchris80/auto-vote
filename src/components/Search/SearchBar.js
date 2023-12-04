@@ -5,7 +5,7 @@ import { useState } from 'react';
 import SearchResultModal from './SearchResultModal';
 import hiveService from 'api/services/hiveService';
 
-const SearchBar = ({ type }) => {
+const SearchBar = ({ type, loadingStates, handleUnfollow, handleFollow }) => {
   const [searchUsername, setSearchUsername] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -62,6 +62,10 @@ const SearchBar = ({ type }) => {
       {searchResult && (
         <SearchResultModal
           show={showModal}
+          type={type}
+          loadingStates={loadingStates}
+          handleUnfollow={handleUnfollow}
+          handleFollow={handleFollow}
           handleClose={handleCloseModal}
           user={searchResult}
         />

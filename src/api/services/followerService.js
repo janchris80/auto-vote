@@ -26,7 +26,7 @@ const followerService = {
   follow: async (userId, trailType) => {
     try {
       const response = await postRequest(`/api/followers/follow`, {
-        user_id: userId,
+        userId: userId,
         type: trailType, // 'curation' or 'downvote'
       });
       return response;
@@ -39,7 +39,7 @@ const followerService = {
   unfollow: async (userId, trailType) => {
     try {
       const response = await postRequest(`/api/followers/unfollow`, {
-        user_id: userId,
+        userId: userId,
         type: trailType, // 'curation' or 'downvote'
       });
       return response;

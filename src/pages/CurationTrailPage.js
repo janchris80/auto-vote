@@ -184,7 +184,12 @@ const CurationTrailPage = () => {
     <Container fluid>
       <Row>
         <Col md="10">
-          <SearchBar type="curation" />
+          <SearchBar
+            type="curation"
+            handleFollow={handleFollow}
+            handleUnfollow={handleUnfollow}
+            loadingStates={loadingStates}
+          />
           <FollowingSetting
             type={type}
             show={showSettings}
@@ -259,7 +264,7 @@ const CurationTrailPage = () => {
                       <th className="border-0">Followers</th>
                       <th className="border-0">Weight</th>
                       <th className="border-0">Method</th>
-                      <th className="border-0">Wait Time</th>
+                      {/* <th className="border-0">Wait Time</th> */}
                       <th className="border-0">Status</th>
                       <th className="border-0">Action</th>
                     </tr>
@@ -279,9 +284,9 @@ const CurationTrailPage = () => {
                               </Link>
                             </td>
                             <td>{followingTrailer.followersCount}</td>
-                            <td>{followingTrailer.weight}</td>
+                            <td>{followingTrailer.weight / 100}%</td>
                             <td className='text-capitalize'>{followingTrailer.method}</td>
-                            <td>{followingTrailer.waitTime}</td>
+                            {/* <td>{followingTrailer.waitTime}</td> */}
                             <td>
                               {
                                 followingTrailer.status

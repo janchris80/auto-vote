@@ -51,15 +51,15 @@ const trailerService = {
     }
   },
 
-  updateStatus: async (id, status, method, type, weight, waitTime, dailyLeft = 5, limitLeft = 5, cancelToken) => {
+  update: async (id, isEnable, votingType, type, weight, afterMin, dailyLeft = 5, limitLeft = 5, cancelToken) => {
     try {
       const response = await putRequest(`/api/follower/update`, {
         id,
-        status,
-        method,
+        isEnable,
+        votingType,
         type,
         weight,
-        waitTime,
+        afterMin,
         dailyLeft,
         limitLeft
       }, { cancelToken: cancelToken.token });

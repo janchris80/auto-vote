@@ -7,20 +7,25 @@ import {
 } from "react-bootstrap";
 
 import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { update as updateUser } from 'slices/auth';
 
 const ClaimRewardPage = () => {
   const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   const [claimReward, setClaimReward] = useState(false);
+  const [loading, setLoading] = useState(false);
+
   const [username, setUsername] = useState('');
   const [authorizeAccount, setAuthorizeAccount] = useState('');
+  const [isAutoClaimReward, setIsAutoClaimReward] = useState(false);
 
   useEffect(() => {
     if (user) {
       setUsername(user.username);
       setAuthorizeAccount(user.authorizeAccount);
-      setClaimReward(user.claimReward);
+      setIsAutoClaimReward(user.isAutoClaimReward);
     }
   }, [user]);
 
@@ -29,14 +34,31 @@ const ClaimRewardPage = () => {
   }, [claimReward]);
 
   const handleEnable = () => {
-    setClaimReward(true);
     // Add your logic to enable the reward
+    handleSubmit()
   };
 
   const handleDisable = () => {
-    setClaimReward(false);
     // Add your logic to disable the reward
+    handleSubmit()
   };
+
+  const handleSubmit = () => {
+    try {
+      setLoading(true)
+      if (window.confirm('Are you sure?')) {
+        dispatch(updateUser({
+          type: 'is_auto_claim_reward',
+          isAutoClaimReward: claimReward,
+        }))
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false)
+      setClaimReward(!claimReward)
+    }
+  }
 
   return (
     <>
@@ -60,17 +82,17 @@ const ClaimRewardPage = () => {
                 <Row>
                   <Col>
                     <strong>Status:</strong>
-                    <span style={{ color: claimReward ? 'green' : 'red' }}>
-                      {claimReward ? 'Enabled' : 'Disabled'}
+                    <span style={{ color: isAutoClaimReward ? 'green' : 'red' }}>
+                      {isAutoClaimReward ? 'Enabled' : 'Disabled'}
                     </span>
                   </Col>
                 </Row>
                 <Row>
                   <Col>
-                    {claimReward ? (
-                      <Button style={{ marginTop: '5px' }} variant="danger" onClick={handleDisable}>Click to Disable</Button>
+                    {isAutoClaimReward ? (
+                      <Button style={{ marginTop: '5px' }} disabled={loading} variant="danger" onClick={() => handleDisable()}>Click to Disable</Button>
                     ) : (
-                      <Button style={{ marginTop: '5px' }} variant="success" onClick={handleEnable}>Click to Enable</Button>
+                      <Button style={{ marginTop: '5px' }} disabled={loading} variant="success" onClick={() => handleEnable()}>Click to Enable</Button>
                     )}
                   </Col>
                 </Row>

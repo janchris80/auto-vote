@@ -9,10 +9,10 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
   const dispatch = useDispatch();
 
   const [id, setId] = useState('');
-  const [status, setStatus] = useState(false);
-  const [method, setMethod] = useState('Scaled');
-  const [weight, setWeight] = useState(50);
-  const [waitTime, setWaitTime] = useState(0);
+  const [isEnable, setIsEnable] = useState(false);
+  const [votingType, setVotingType] = useState('Scaled');
+  const [weight, setWeight] = useState(100);
+  const [afterMin, setAfterMin] = useState(0);
   const [dailyLeft, setDailyLeft] = useState(1);
   const [limitLeft, setLimitLeft] = useState(1);
   const [username, setUsername] = useState('null')
@@ -22,10 +22,10 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
     if (trailer) {
       setUsername(trailer.username)
       setId(trailer.id)
-      setStatus(trailer.status)
-      setMethod(trailer.method)
-      setWeight(trailer.weight)
-      setWaitTime(trailer.waitTime)
+      setIsEnable(trailer.isEnable)
+      setVotingType(trailer.votingType)
+      setWeight(trailer.weight / 100)
+      setAfterMin(trailer.afterMin)
       setDailyLeft(trailer.dailyLeft)
       setLimitLeft(trailer.limitLeft)
     }
@@ -34,33 +34,20 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
   const handleSubmit = (event) => {
     event.preventDefault();
     // Implement your submit logic here
-    // Use the state values id, status, method, type, weight, waitTime, dailyLeft, limitLeft
+    // Use the state values id, isEnable, votingType, type, weight, afterMin, dailyLeft, limitLeft
     const cancelTokenSource = instance.createCancelToken();
     try {
       dispatch(updateFollowingTrail({
         id,
-        status,
-        method,
+        isEnable,
+        votingType,
         type,
         weight,
-        waitTime,
+        afterMin,
         dailyLeft,
         limitLeft,
         cancelToken: cancelTokenSource,
       }))
-
-      console.log('updateFollowingTrail submit:', {
-        id,
-        status,
-        method,
-        type,
-        weight,
-        waitTime,
-        dailyLeft,
-        limitLeft,
-        cancelToken: cancelTokenSource,
-        isSubmitted
-      });
 
       setIsSubmitted(true)
     } catch (error) {
@@ -77,7 +64,7 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
     }
   }, [isSubmitted])
 
-  const toggleStatus = () => setStatus(!status);
+  const toggleStatus = () => setIsEnable(!isEnable);
 
   return (
     <Modal show={show} onHide={onHide}>
@@ -89,16 +76,16 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
 
           {/* Status Checkbox */}
           <div className="form-group">
-            <label className="mr-2">Status: <span style={{ color: status ? 'green' : 'red' }}>
-              {status ? 'Enabled' : 'Disabled'}
+            <label className="mr-2">Status: <span style={{ color: isEnable ? 'green' : 'red' }}>
+              {isEnable ? 'Enabled' : 'Disabled'}
             </span>
             </label>
             <Button
               size='sm'
-              variant={!status ? 'success' : 'danger'}
+              variant={!isEnable ? 'success' : 'danger'}
               onClick={() => toggleStatus()}
             >
-              {!status ? 'Click to Enable' : 'Click to Disable'}
+              {!isEnable ? 'Click to Enable' : 'Click to Disable'}
             </Button>
           </div>
 
@@ -106,13 +93,12 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
             type === 'curation' && <>
               {/* Method Selection */}
               <div className="form-group">
-                <label htmlFor="methodSelect">Method</label>
+                <label htmlFor="votingTypeSelect">Method</label>
                 <select
                   className="form-control"
-                  id="methodSelect"
-                  value={method}
-                  onChange={(e) => setMethod(e.target.value)}
-                  name="method"
+                  id="votingTypeSelect"
+                  value={votingType}
+                  onChange={(e) => setVotingType(e.target.value)}
                 >
                   <option value="Scaled">Scaled</option>
                   <option value="Fixed">Fixed</option>
@@ -139,17 +125,17 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
 
           {/* Wait Time Slider */}
           <div className="form-group">
-            <label htmlFor="waitTimeSlider">Wait Time (0 - 1440 min)</label>
+            <label htmlFor="afterMinSlider">Wait Time (0 - 1440 min)</label>
             <input
               type="number"
               className="form-control"
-              id="waitTimeSlider"
+              id="afterMinSlider"
               min="0"
               max="1440"
               step="0.01"
-              value={waitTime}
-              onChange={(e) => setWaitTime(e.target.value)}
-              name="waitTime"
+              value={afterMin}
+              onChange={(e) => setAfterMin(e.target.value)}
+              name="afterMin"
             />
           </div>
 

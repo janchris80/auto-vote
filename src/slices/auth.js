@@ -17,7 +17,7 @@ const authSlice = createSlice({
     loginSuccess: (state, action) => {
       state.isLoggedIn = true;
       state.user = action.payload.user;
-      state.isAuthorizeApp = action.payload.user.enable;
+      state.isAuthorizeApp = action.payload.user.isEnable;
     },
     loginFailure: (state, action) => {
       state.isLoggedIn = false;
@@ -29,7 +29,8 @@ const authSlice = createSlice({
       state.user = null;
     },
     updateAuthorizeStatus: (state, action) => {
-      state.isAuthorizeApp = action.payload.isAuthorizeApp;
+      state.user.isEnable = action.payload.isEnable;
+      state.isAuthorizeApp = action.payload.isEnable;
     },
     setAccessToken: (state, action) => {
       state.accessToken = action.payload.accessToken;
@@ -42,9 +43,9 @@ const authSlice = createSlice({
 
 export const { loginSuccess, loginFailure, logoutSuccess, updateAuthorizeStatus, setAccessToken, updateUser } = authSlice.actions;
 
-export const update = ({ currentPower, limitPower, paused }) => async (dispatch) => {
+export const update = ({ limitPower = 0, isPause = false, isEnable = false, type, isAutoClaimReward = false }) => async (dispatch) => {
   try {
-    const response = await authService.update(currentPower, limitPower, paused);
+    const response = await authService.update(limitPower, isPause, isEnable, type, isAutoClaimReward);
 
     console.log(response);
     dispatch(updateUser({user: response}));
@@ -76,15 +77,15 @@ export const login = ({ username }) => async (dispatch) => {
       error.message ||
       error.toString();
     console.error(message);
-    dispatch(loginFailure());
+    // dispatch(loginFailure());
   }
 };
 
 export const addAccountAuthority = ({ username, authorizeAccount }) => async (dispatch) => {
   try {
-    const response = await keychainService.addAccountAuthority(username, authorizeAccount);
+    const response = await keychainService.requestAddAccountAuthority(username, authorizeAccount);
     if (response.success) {
-      dispatch(updateAuthorizeStatus({ isAuthorizeApp: 1 }));
+      dispatch(updateAuthorizeStatus({ isEnable: true }));
     }
   } catch (error) {
     const message =
@@ -94,7 +95,6 @@ export const addAccountAuthority = ({ username, authorizeAccount }) => async (di
       error.message ||
       error.toString();
     console.error(message);
-    dispatch(loginFailure());
   }
 };
 
@@ -102,7 +102,7 @@ export const removeAccountAuthority = ({ username, authorizeAccount }) => async 
   try {
     const response = await keychainService.requestRemoveAccountAuthority(username, authorizeAccount);
     if (response.success) {
-      dispatch(updateAuthorizeStatus({ isAuthorizeApp: 0 }));
+      dispatch(updateAuthorizeStatus({ isEnable: false }));
     }
   } catch (error) {
     const message =
@@ -112,7 +112,6 @@ export const removeAccountAuthority = ({ username, authorizeAccount }) => async 
       error.message ||
       error.toString();
     console.error(message);
-    dispatch(loginFailure());
   }
 };
 

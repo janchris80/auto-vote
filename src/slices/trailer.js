@@ -185,28 +185,12 @@ export const getTrailer = ({ type, cancelToken }) => async (dispatch) => {
 };
 
 export const updateFollowingTrail = ({
-  id,
-  status,
-  method,
-  type,
-  weight,
-  waitTime,
-  dailyLeft,
-  limitLeft,
-  cancelToken
+  id, isEnable, votingType, type, weight, afterMin, dailyLeft, limitLeft, cancelToken
 }) => async (dispatch) => {
 
   try {
-    const { data } = await trailerService.updateStatus(
-      id,
-      status,
-      method,
-      type,
-      weight,
-      waitTime,
-      dailyLeft,
-      limitLeft,
-      cancelToken
+    const { data } = await trailerService.update(
+      id, isEnable, votingType, type, weight, afterMin, dailyLeft, limitLeft, cancelToken
     );
 
   } catch (error) {

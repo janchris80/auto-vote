@@ -1,5 +1,6 @@
+import UpvoteCommentForm from 'components/common/UpvoteCommentForm';
 import React, { useState, useEffect } from 'react';
-import { Card, Button, Form, Row, Col, Table } from 'react-bootstrap';
+import { Card, Button, Form, Row, Col, Table, Modal } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
 const UpvoteCommentPage = () => {
@@ -16,10 +17,7 @@ const UpvoteCommentPage = () => {
   }, [user]);
 
   const handleFormToggle = () => setShowForm(!showForm);
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Implement form submission logic here
-  };
+
 
   return (
     <div className="content">
@@ -33,15 +31,12 @@ const UpvoteCommentPage = () => {
                 {/* ... rest of the content ... */}
               </p>
               <center>
-                <Button variant="success" style={{ marginTop: '8px' }} onClick={handleFormToggle}>
+                <Button variant="success" style={{ marginTop: '8px' }} onClick={() => handleFormToggle()}>
                   Add a User to the List
                 </Button>
               </center>
-              {showForm && (
-                <Form style={{ display: 'none' }} id="addusertolist" onSubmit={handleSubmit}>
-                  {/* Form contents */}
-                </Form>
-              )}
+
+              <UpvoteCommentForm show={showForm} onHide={() => handleFormToggle()}/>
             </Card.Body>
           </Card>
         </Col>

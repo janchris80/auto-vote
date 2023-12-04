@@ -1,12 +1,13 @@
 // Search/SearchResultModal.js
 import { useEffect, useState } from 'react';
-import { Button, Modal, Row, Col, Image, Card, Container } from 'react-bootstrap';
+import { Button, Modal, Row, Col, Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 
-const SearchResultModal = ({ show, handleClose, user }) => {
+const SearchResultModal = ({ show, handleClose, user, type, loadingStates, handleUnfollow, handleFollow }) => {
   const [jsonMetadata, setJsonMetadata] = useState({});
   const [hiveUser, setHiveUser] = useState({});
   const [webUser, setWebUser] = useState({});
+  const [isFollowed, setIsFollowed] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -16,6 +17,16 @@ const SearchResultModal = ({ show, handleClose, user }) => {
       setWebUser(user?.user);
     }
   }, [show, user])
+
+  useEffect(() => {
+    if (webUser) {
+      setIsFollowed(webUser?.isFollowed ? true : false)
+    }
+  }, [webUser])
+
+  useEffect(() => {
+    setIsFollowed(!isFollowed);
+  }, [handleFollow, handleUnfollow])
 
   return (
     <Modal show={show} onHide={handleClose}>
@@ -35,40 +46,39 @@ const SearchResultModal = ({ show, handleClose, user }) => {
               </Link>
             </Card.Title>
             <Card.Subtitle className="mb-2 text-muted">{jsonMetadata?.profile?.about}</Card.Subtitle>
-            <Card.Text>
+            <div>
               <p>Post Count: {hiveUser?.post_count || 0}</p>
               <p>Followed: {hiveUser?.post_count || 0}</p>
-              <div>
-                <Row className=''>
-                  <Col>
-                    <p>
-                      Has Curation Trail: {webUser.curation_trailer ? 'Yes' : 'No'}
-                    </p>
-                  </Col>
-                  <Col>
-                    {
-                      webUser.curation_trailer
-                        ? <Button size='sm' variant='success'>Follow Trail</Button>
-                        : null
-                    }
-                  </Col>
-                </Row>
+            </div>
+            <div>
+              <Row>
+                <Col>
+                  <p>
+                    Has Curation Trail: {webUser.curation_trailer ? 'Yes' : 'No'}
+                  </p>
+                </Col>
+                <Col>
+                  {
+                    webUser.curation_trailer
+                      ? <Button size='sm' variant='success'>Follow Trail</Button>
+                      : null
+                  }
+                </Col>
+              </Row>
 
-                <Row className=''>
-                  <Col>
-                    <p>Has Downvote Trail: {webUser.downvote_trailer ? 'Yes' : 'No'}</p>
-                  </Col>
-                  <Col>
-                    {
-                      webUser.downvote_trailer
-                        ? <Button size='sm' variant='success'>Follow Trail</Button>
-                        : null
-                    }
-                  </Col>
-                </Row>
-              </div>
-
-            </Card.Text>
+              <Row className=''>
+                <Col>
+                  <p>Has Downvote Trail: {webUser.downvote_trailer ? 'Yes' : 'No'}</p>
+                </Col>
+                <Col>
+                  {
+                    webUser.downvote_trailer
+                      ? <Button size='sm' variant='success'>Follow Trail</Button>
+                      : null
+                  }
+                </Col>
+              </Row>
+            </div>
           </Card.Body>
         </Card>
       </Modal.Body>
@@ -77,9 +87,14 @@ const SearchResultModal = ({ show, handleClose, user }) => {
         <Button variant="secondary" onClick={handleClose}>
           Close
         </Button>
-        {/* <Button as={Link} to={`/curation-trail/@${user?.name}`} variant="primary">
-          Go to Profile
-        </Button> */}
+        {isFollowed
+          ? <Button variant='danger' onClick={() => handleUnfollow(webUser.id)}>
+            {loadingStates[webUser.id] ? 'Unfollowing...' : 'Unfollow'}
+          </Button>
+          : <Button variant='success' onClick={() => handleFollow(webUser.id)}>
+            {loadingStates[webUser.id] ? 'Following...' : 'Follow'}
+          </Button>
+        }
       </Modal.Footer>
     </Modal>
   );

@@ -1,5 +1,6 @@
-import hiveService from 'api/services/hiveService';
 import { useState, useEffect } from 'react';
+import hiveService from 'api/services/hiveService';
+import hive from '@hiveio/hive-js';
 import {
   Button,
   Card,
@@ -13,60 +14,67 @@ import { update as updateUser } from 'slices/auth';
 import { removeAccountAuthority, addAccountAuthority } from 'slices/auth';
 
 export default function DashboardPage() {
-  const { user, isAuthorizeApp } = useSelector((state) => state.auth);
-  const [username, setUsername] = useState('');
-  const [authorizeAccount, setAuthorizeAccount] = useState('');
-  const [upvotingStatus, setUpvotingStatus] = useState('Normal');
-  const [upvotingStatusColor, setUpvotingStatusColor] = useState('success');
-  const [currentPower, setCurrentPower] = useState(0.00);
-  const [powerLimit, setPowerLimit] = useState(false);
-  const [limitPower, setLimitPower] = useState(100);
-  const [updateLimitPower, setUpdateLimitPower] = useState(0);
-  const [paused, setPaused] = useState(true);
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
+  const { user, isAuthorizeApp } = useSelector((state) => state.auth);
+
+  const [authorizeAccount, setAuthorizeAccount] = useState('');
+  const [upvotingStatus, setUpvotingStatus] = useState({});
+  const [downvotingStatus, setDownvotingStatus] = useState({});
+  const [currentUpvoteMana, setCurrentUpvoteMana] = useState(null);
+  const [currentDownvoteMana, setCurrentDownvoteMana] = useState(null);
+  const [showUpvoteForm, setShowUpvoteForm] = useState(false);
+  const [showDownvoteForm, setShowDownvoteForm] = useState(false);
+  const [updateLimitUpvoteMana, setUpdateLimitUpvoteMana] = useState(1);
+  const [updateLimitDownvoteMana, setUpdateLimitDownvoteMana] = useState(1);
+
+  const [loading, setLoading] = useState(false);
+
+  const [username, setUsername] = useState('');
+  const [limitUpvoteMana, setLimitUpvoteMana] = useState(100);
+  const [limitDownvoteMana, setLimitDownvoteMana] = useState(100);
+  const [isPause, setIsPause] = useState(true);
+  const [isEnable, setIsEnable] = useState(false);
+  const [isAutoClaimReward, setIsAutoClaimReward] = useState(false);
 
   useEffect(() => {
-    setUsername(user?.username);
-    setAuthorizeAccount(user?.authorizeAccount);
+    if (user) {
+      setUsername(user.username);
+      setAuthorizeAccount(user.authorizeAccount);
+      setIsAutoClaimReward(user.isAutoClaimReward);
+      setIsPause(user.isPause);
+      setIsEnable(user.isEnable);
+      setLimitUpvoteMana(user?.limitUpvoteMana / 100)
+      setLimitDownvoteMana(user?.limitDownvoteMana / 100)
+    }
   }, [user]);
 
-  // only run if isAuthorizeApp = 1, default is 0
   useEffect(() => {
+    // only run if isAuthorizeApp = 1, default is 0
     if (isAuthorizeApp) {
       const handleSettings = async () => {
         setLoading(true);
 
         try {
-          const result = await hiveService.getAccounts([username]);
-          const userAcc = result[0];
-
-          if (userAcc) {
-            let delegated = parseFloat(userAcc.delegated_vesting_shares.replace('VESTS', ''));
-            let received = parseFloat(userAcc.received_vesting_shares.replace('VESTS', ''));
-            let vesting = parseFloat(userAcc.vesting_shares.replace('VESTS', ''));
+          const result = await hiveService.getAccounts([user.username]);
+          const account = result[0];
+          if (account) {
+            let delegated = parseFloat(account.delegated_vesting_shares.replace('VESTS', ''));
+            let received = parseFloat(account.received_vesting_shares.replace('VESTS', ''));
+            let vesting = parseFloat(account.vesting_shares.replace('VESTS', ''));
             let withdrawRate = 0;
 
-            if (parseInt(userAcc.vesting_withdraw_rate.replace('VESTS', '')) > 0) {
+            if (parseInt(account.vesting_withdraw_rate.replace('VESTS', '')) > 0) {
               withdrawRate = Math.min(
-                parseInt(userAcc.vesting_withdraw_rate.replace('VESTS', '')),
-                parseInt((userAcc.to_withdraw - userAcc.withdrawn) / 1000000)
+                parseInt(account.vesting_withdraw_rate.replace('VESTS', '')),
+                parseInt((account.to_withdraw - account.withdrawn) / 1000000)
               );
             }
 
             let totalvest = vesting + received - delegated - withdrawRate
             let maxMana = Number(totalvest * Math.pow(10, 6))
-            let delta = Date.now() / 1000 - userAcc.voting_manabar.last_update_time
-            let current_mana = Number(userAcc.voting_manabar.current_mana) + (delta * maxMana / 432000)
-            let percentage = Math.round(current_mana / maxMana * 10000)
 
-            if (!isFinite(percentage)) percentage = 0
-            if (percentage > 10000) percentage = 10000
-            else if (percentage < 0) percentage = 0
-
-            let percent = (percentage / 100).toFixed(2)
-
-            setCurrentPower(percent);
+            setCurrentUpvoteMana(calculatePercent(account.voting_manabar.current_mana, account.voting_manabar.last_update_time, maxMana));
+            setCurrentDownvoteMana(calculatePercent(account.downvote_manabar.current_mana, account.downvote_manabar.last_update_time, maxMana));
           }
         } catch (error) {
           console.error('Error making the request:', error);
@@ -77,53 +85,85 @@ export default function DashboardPage() {
 
       handleSettings();
 
-      if (parseFloat(currentPower) < parseFloat(limitPower)) {
-        setUpvotingStatus('Paused');
-        setUpvotingStatusColor('danger');
-        setPaused(true)
+      if (parseFloat(currentUpvoteMana) < parseFloat(limitUpvoteMana)) {
+        setUpvotingStatus({
+          text: 'Paused',
+          color: 'danger',
+        });
       } else {
-        setUpvotingStatus('Normal');
-        setUpvotingStatusColor('success');
-        setPaused(false)
+        setUpvotingStatus({
+          text: 'Normal',
+          color: 'success',
+        });
       }
 
-      setLimitPower(user?.limitPower)
-
+      if (parseFloat(currentDownvoteMana) < parseFloat(limitDownvoteMana)) {
+        setDownvotingStatus({
+          text: 'Paused',
+          color: 'danger',
+        });
+      } else {
+        setDownvotingStatus({
+          text: 'Normal',
+          color: 'success',
+        });
+      }
     }
-  }, [user, limitPower, isAuthorizeApp, currentPower]);
+  }, [isAuthorizeApp, limitUpvoteMana, currentUpvoteMana, limitDownvoteMana, currentDownvoteMana]);
 
-  const handleFormSubmit = async (e) => {
+  const calculatePercent = (mana, lastUpdateTime, maxMana) => {
+    let delta = (Date.now() / 1000 - lastUpdateTime);
+    let currentMana = Number(mana) + (delta * maxMana / 432000)
+    let percentage = Math.round(currentMana / maxMana * 10000)
+    let percent = (Math.min(Math.max(percentage, 0), 10000) / 100).toFixed(2)
+    return percent;
+  }
+
+  useEffect(() => {
+    if (showUpvoteForm) {
+      setShowDownvoteForm(false)
+    }
+
+    if (showDownvoteForm) {
+      setShowUpvoteForm(false)
+    }
+
+  }, [showUpvoteForm, showDownvoteForm])
+
+  const handleUpvoteFormSubmit = async (e) => {
     e.preventDefault();
     try {
       if (window.confirm('Are you sure?')) {
         dispatch(updateUser({
-          currentPower: parseFloat(currentPower),
-          limitPower: parseFloat(updateLimitPower),
-          paused: paused
+          limitPower: updateLimitUpvoteMana,
+          isPause: isPause,
+          isEnable: isEnable,
+          type: 'upvote',
         }))
-        setPowerLimit(false);
+        setShowUpvoteForm(false);
       }
     } catch (error) {
       console.error(error);
     }
   };
 
-  useEffect(() => {
-    const handleLogin = () => {
-      console.log('Logging in');
-    };
 
-    const loginButtons = document.querySelectorAll(".login-button");
-    loginButtons.forEach((button) => {
-      button.addEventListener("click", handleLogin);
-    });
-
-    return () => {
-      loginButtons.forEach((button) => {
-        button.removeEventListener("click", handleLogin);
-      });
-    };
-  }, []);
+  const handleDownvoteFormSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      if (window.confirm('Are you sure?')) {
+        dispatch(updateUser({
+          limitPower: updateLimitDownvoteMana,
+          isPause: isPause,
+          isEnable: isEnable,
+          type: 'downvote',
+        }))
+        setShowDownvoteForm(false);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const handleAddAuthority = async () => {
     try {
@@ -141,7 +181,8 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSetUpdateLimitPower = (e) => setUpdateLimitPower(e.target.value);
+  const handleSetUpdateLimitUpvoteMana = (e, type) => setUpdateLimitUpvoteMana(e.target.value);
+  const handleSetUpdateLimitDownvoteMana = (e, type) => setUpdateLimitDownvoteMana(e.target.value);
 
   return (
     <Container fluid>
@@ -184,22 +225,24 @@ export default function DashboardPage() {
                   <center>
                     <h4 style={{ borderBottom: '1px solid #000', paddingBottom: '10px' }}>Settings</h4>
                   </center>
-                  <h5 className='font-weight-bold'>
-                    Upvoting status:
-                    {!loading ? <span className={`text-${upvotingStatusColor} ml-1`}>{upvotingStatus}</span> : 'Loading...'}
-                  </h5>
-                  <h5 className='font-weight-bold'>
-                    Current Mana: {!loading ? `${currentPower}%` : 'Loading...'}
-                  </h5>
-                  <h5 className='font-weight-bold mx-auto'>
-                    Limit on Mana:
-                    <span> {!loading ? `${limitPower}%` : 'Loading...'}
-                      <Button size='sm' variant="Link" className='ml-1' onClick={() => setPowerLimit(!powerLimit)}>
-                        (Click to edit)
-                      </Button>
-                    </span>
-                  </h5>
-                  <Form onSubmit={handleFormSubmit} style={{ display: powerLimit ? 'block' : 'none' }}>
+                  <div className={currentUpvoteMana ? 'none' : ''}>
+                    <h5 className='font-weight-bold'>
+                      Upvoting status:
+                      {!loading ? <span className={`text-${upvotingStatus?.color} ml-1`}>{upvotingStatus?.text}</span> : 'Loading...'}
+                    </h5>
+                    <h5 className='font-weight-bold'>
+                      Current Upvote Mana: {!loading ? `${currentUpvoteMana}%` : 'Loading...'}
+                    </h5>
+                    <h5 className='font-weight-bold mx-auto'>
+                      Upvote Mana threshold:
+                      <span> {!loading ? `${limitUpvoteMana}%` : 'Loading...'}
+                        <Button size='sm' variant="Link" className='ml-1' onClick={() => setShowUpvoteForm(!showUpvoteForm)}>
+                          (Click to edit)
+                        </Button>
+                      </span>
+                    </h5>
+                  </div>
+                  <Form onSubmit={(e) => handleUpvoteFormSubmit(e)} style={{ display: showUpvoteForm ? 'block' : 'none' }}>
                     <Form.Group>
                       <Form.Label htmlFor="powerlimit">Mana limitation (%):</Form.Label>
                       <Form.Control
@@ -207,10 +250,45 @@ export default function DashboardPage() {
                         name="powerlimit"
                         type="number"
                         min="1"
-                        max="99.99"
+                        max="100"
                         step="0.01"
-                        value={updateLimitPower}
-                        onChange={(e) => handleSetUpdateLimitPower(e)}
+                        value={updateLimitUpvoteMana}
+                        onChange={(e) => handleSetUpdateLimitUpvoteMana(e)}
+                        required
+                      />
+                    </Form.Group>
+                    <Button type="submit" style={{ marginTop: '5px' }} variant="primary">
+                      Submit
+                    </Button>
+                  </Form>
+                  <div>
+                    <h5 className='font-weight-bold'>
+                      Downvoting status:
+                      {!loading ? <span className={`text-${downvotingStatus?.color} ml-1`}>{downvotingStatus?.text}</span> : 'Loading...'}
+                    </h5>
+                    <h5 className='font-weight-bold'>
+                      Current Downvote Mana: {!loading ? `${currentDownvoteMana}%` : 'Loading...'}
+                    </h5>
+                    <h5 className='font-weight-bold mx-auto'>
+                      Downvote Mana threshold:
+                      <span> {!loading ? `${limitDownvoteMana}%` : 'Loading...'}
+                        <Button size='sm' variant="Link" className='ml-1' onClick={() => setShowDownvoteForm(!showDownvoteForm)}>
+                          (Click to edit)
+                        </Button>
+                      </span>
+                    </h5>
+                  </div>
+                  <Form onSubmit={(e) => handleDownvoteFormSubmit(e)} style={{ display: showDownvoteForm ? 'block' : 'none' }}>
+                    <Form.Group>
+                      <Form.Label htmlFor="powerlimit">Mana limitation (%):</Form.Label>
+                      <Form.Control
+                        id="powerlimit"
+                        type="number"
+                        min="1"
+                        max="100"
+                        step="0.01"
+                        value={updateLimitDownvoteMana}
+                        onChange={(e) => handleSetUpdateLimitDownvoteMana(e)}
                         required
                       />
                     </Form.Group>
