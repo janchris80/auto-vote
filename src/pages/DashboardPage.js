@@ -35,6 +35,8 @@ export default function DashboardPage() {
   const [isPause, setIsPause] = useState(true);
   const [isEnable, setIsEnable] = useState(false);
   const [isAutoClaimReward, setIsAutoClaimReward] = useState(false);
+  const [account, setAccount] = useState(null);
+  const [authorized, setAuthorized] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -49,14 +51,64 @@ export default function DashboardPage() {
   }, [user]);
 
   useEffect(() => {
-    // only run if isAuthorizeApp = 1, default is 0
-    if (isAuthorizeApp) {
+    console.log('fetching getHiveAccount()');
+    getHiveAccount();
+  }, [])
+
+  useEffect(() => {
+    if (account) {
+      console.log('setAuthorized', isUserAuthorized(authorizeAccount));
+      setAuthorized(isUserAuthorized(authorizeAccount));
+    }
+  }, [account])
+
+
+  useEffect(() => {
+    if (authorized) {
+      console.log('Authorized! Updating database');
+      try {
+        dispatch(updateUser({
+          isEnable: true,
+          type: 'is_enable',
+        }))
+        console.log('done');
+      } catch (error) {
+        console.error('Error: Updating dabase ', error);
+      }
+    }
+  }, [authorized])
+
+  const getHiveAccount = async () => {
+    try {
+      const result = await hiveService.getAccounts([user.username]);
+      if (result[0]) {
+        setAccount(result[0]);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  const isUserAuthorized = (keyToCheck) => {
+    if (account) {
+      // Extracting active and posting keys and account authorizations from the user data
+      const postingAccounts = account.posting.account_auths.map(accountAuth => accountAuth[0]);
+
+      // Checking if the provided key is in either the active or posting keys or accounts
+      return postingAccounts.includes(keyToCheck);
+    }
+
+    return false;
+  }
+
+  useEffect(() => {
+    console.log('computing', isAuthorizeApp, authorized);
+    if (isAuthorizeApp || authorized) {
       const handleSettings = async () => {
         setLoading(true);
 
         try {
-          const result = await hiveService.getAccounts([user.username]);
-          const account = result[0];
+
           if (account) {
             let delegated = parseFloat(account.delegated_vesting_shares.replace('VESTS', ''));
             let received = parseFloat(account.received_vesting_shares.replace('VESTS', ''));
@@ -83,6 +135,7 @@ export default function DashboardPage() {
         }
       };
 
+      console.log("handleSettings()");
       handleSettings();
 
       if (parseFloat(currentUpvoteMana) < parseFloat(limitUpvoteMana)) {
@@ -109,7 +162,7 @@ export default function DashboardPage() {
         });
       }
     }
-  }, [isAuthorizeApp, limitUpvoteMana, currentUpvoteMana, limitDownvoteMana, currentDownvoteMana]);
+  }, [isAuthorizeApp, account, limitUpvoteMana, currentUpvoteMana, limitDownvoteMana, currentDownvoteMana]);
 
   const calculatePercent = (mana, lastUpdateTime, maxMana) => {
     let delta = (Date.now() / 1000 - lastUpdateTime);
