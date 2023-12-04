@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = 'http://localhost:8000/';
+const baseURL = process.env.NODE_ENV === 'production' ? process.env.API_DOMAIN : 'http://localhost:8000/';
 
 const instance = axios.create({
     baseURL,
