@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const baseURL = process.env.NODE_ENV === 'production' ? process.env.API_DOMAIN : 'http://localhost:8000/';
+const baseURL = process.env.NODE_ENV === 'production' ? process.env.REACT_APP_API_DOMAIN : 'http://localhost:8000/';
 console.log("baseUrl: ", baseURL);
 console.log("process.env ", process.env);
 
