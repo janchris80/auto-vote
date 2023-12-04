@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { KeychainSDK } from "keychain-sdk";
+import { KeychainKeyTypes, KeychainSDK } from "keychain-sdk";
 // react-bootstrap components
 import {
   Container,
@@ -18,7 +18,6 @@ export default function SchedulePostPage() {
   const [data, setData] = useState([]);
   const [username, setUsername] = useState([]);
   const { user } = useSelector((state) => state.auth);
-  console.log(user.username);
 
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
@@ -30,7 +29,7 @@ export default function SchedulePostPage() {
   const [allowVotes, setAllowVotes] = useState(false);
   const [allowCurationRewards, setAllowCurationRewards] = useState(false);
 
-  const loginData = JSON.parse(localStorage.getItem('login'))
+  console.log(keychain, window.hive_keychain);
 
   useEffect(() => {
     setUsername(user.username)
@@ -54,7 +53,7 @@ export default function SchedulePostPage() {
           permlink: permalink,
           comment_options: JSON.stringify(
             {
-              "author": loginData?.data?.username,
+              "author": username,
               "permlink": permalink,
               "max_accepted_payout": "10000.000 HBD",
               "allow_votes": true,
@@ -70,6 +69,138 @@ export default function SchedulePostPage() {
     } catch (error) {
       console.log({ error });
     }
+  }
+
+  const postContent = async () => {
+    // if (window.hive_keychain) {
+    //   // Use hive_keychain API to request private key
+    //   window.hive_keychain.requestPost(
+    //     'iamjc93', // account
+    //     'Hello World!', // title
+    //     '## This is a blog post \n\nAnd this is some text', // body
+    //     'Blog', // parent_perm
+    //     {
+    //       format: 'markdown',
+    //       description: 'A blog post',
+    //       tags: ['Blog']
+    //     }, // json_metadata
+    //     'hello-i-am-using-request-post-from-hive-keychain', // permlink
+    //     {
+    //       "author": "iamjc93",
+    //       "permlink": "hi-i-am-using-request-post-from-hive-keychain",
+    //       "max_accepted_payout": "100000.000 SBD",
+    //       "percent_steem_dollars": 10000,
+    //       "allow_votes": true,
+    //       "allow_curation_rewards": true,
+    //       "extensions": [
+    //         [
+    //           0,
+    //           {
+    //             "beneficiaries": [
+    //               { "account": "yabapmatt", "weight": 1000 },
+    //               { "account": "steemplus-pay", "weight": 500 }
+    //             ]
+    //           }
+    //         ]
+    //       ]
+    //     },
+    //     (response) => {
+    //       console.log(response);
+    //     }
+    //   );
+
+    // } else {
+    //   alert('Hive Keychain is not installed.');
+    // }
+
+
+    try {
+
+      // const formParamsAsObject = {
+      //   "data": {
+      //     "username": "iamjc93",
+      //     "tx": {
+      //       "ref_block_num": 25791,
+      //       "ref_block_prefix": 879493653,
+      //       "expiration": "2023-11-15T06:46:22",
+      //       "operations": [
+      //         [
+      //           "comment",
+      //           {
+      //             "parent_author": "",
+      //             "parent_permlink": "hive-keychain",
+      //             "author": "iamjc93",
+      //             "permlink": "hello-world",
+      //             "title": "Hello World!",
+      //             "body": "This is my first post using Hive Keychain.",
+      //             "json_metadata": JSON.stringify({ tags: ['hive-keychain'] }),
+      //           },
+      //         ],
+      //       ],
+      //       "extensions": [],
+      //     },
+      //     "method": KeychainKeyTypes.posting,
+      //   },
+      //   "broadcastSignedTx": true,
+      // };
+
+      // const signtx = await keychain.signTx(formParamsAsObject.data);
+      // console.log({ signtx });
+
+      const account = 'dbuzz';
+      const author = 'iamjc93';
+      const permlink = 'trying-to-sign-a-post-in-my-localhost';
+      const title = 'Signing a post and broadcast via php backend';
+      const body = 'Your post content...';
+      const parent_perm = 'blogs';
+      const parent_username = 'iamcj93';
+      const json_metadata = JSON.stringify({
+        "format": "markdown",
+        "description": "A blog post",
+        "tags": [
+          "Blog"
+        ]
+      });
+
+      const comment_options = JSON.stringify({
+        "author": author,
+        "permlink": permlink,
+        "max_accepted_payout": "10000.000 HBD",
+        "allow_votes": true,
+        "allow_curation_rewards": true,
+        "extensions": [],
+        "percent_hbd": 63
+      })
+
+      hive_keychain.requestPost(
+        account,
+        title,
+        body,
+        parent_perm,
+        null,
+        json_metadata,
+        permlink,
+        comment_options,
+        function (response) {
+          console.log(response);
+          if (response.success) {
+            // Send the signed transaction to your backend
+            // sendTransactionToBackend(response.result);
+          } else {
+            // Handle errors
+            console.error('Error signing transaction:', response.message);
+          }
+        }
+      );
+    } catch (error) {
+      console.log({ error });
+    }
+
+  }
+
+  function callbackFunction(response) {
+    // Handle the response from Hive Keychain
+    console.log(response);
   }
 
   const after = (x) => {
@@ -99,6 +230,7 @@ export default function SchedulePostPage() {
         <Col>
           <Card>
             <Card.Body>
+              <Button onClick={() => postContent()}>Click me</Button>
               <h3>Welcome {username},</h3>
               <br />
               This page is where you can schedule a post to publish in the future.

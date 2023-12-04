@@ -17,6 +17,7 @@
 */
 import React, { Component } from "react";
 import { Container } from "react-bootstrap";
+import { Link } from 'react-router-dom';
 
 class Footer extends Component {
   render() {
@@ -26,29 +27,24 @@ class Footer extends Component {
           <nav>
             <ul className="footer-menu">
               <li>
-                <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  Home
-                </a>
+                <Link to={'/'}  onClick={(e) => e.preventDefault()}>
+                  Dashboard
+                </Link>
               </li>
               <li>
-                <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  Company
-                </a>
+                <Link to={'/'}  onClick={(e) => e.preventDefault()}>
+                  Contact Us
+                </Link>
               </li>
               <li>
-                <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  Portfolio
-                </a>
-              </li>
-              <li>
-                <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                  Blog
-                </a>
+                <Link to={'/'}  onClick={(e) => e.preventDefault()}>
+                  About Us
+                </Link>
               </li>
             </ul>
             <p className="copyright text-center">
               © {new Date().getFullYear()}{" "}
-              <a href="#">HiveVote</a>
+              <Link to="/">AutoVote</Link>
             </p>
           </nav>
         </Container>

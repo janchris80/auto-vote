@@ -1,76 +1,58 @@
-// api/axios folder
 import axios from 'axios';
 
+const baseURL = process.env.NODE_ENV === 'production' ? process.env.API_DOMAIN : 'http://localhost:8000/';
+
 const instance = axios.create({
-    baseURL: 'http://localhost:8000/',
+    baseURL,
     headers: {
-        // 'Accept': 'application/vnd.api+json',
-        // 'Content-Type': 'application/vnd.api+json',
         'X-Requested-With': 'XMLHttpRequest',
     },
     withCredentials: true,
 });
 
-const { accessToken } = JSON.parse(localStorage.getItem("user"));
+instance.createCancelToken = () => axios.CancelToken.source();
 
-const postRequest = (url, data = {}) => {
-    return instance.post(url, data,
-        {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`, // Include the bearer token
-            },
-        }
-    )
-}
+const getUserAccessToken = () => {
+    const userString = localStorage.getItem("persist:root");
 
-const getRequest = (url) => {
-    return instance.get(url,
-        {
-            headers: {
-                'Authorization': `Bearer ${accessToken}`, // Include the bearer token
-            },
-        }
-    )
-}
+    try {
+        const { auth } = JSON.parse(userString || '{}');
+        const { accessToken } = JSON.parse(auth || '{}');
+        return accessToken;
+    } catch (error) {
+        console.error("Error parsing user information from localStorage", error);
+        return null;
+    }
+};
 
-const getPublicRequest = (url) => {
-    return instance.get(url);
-}
+const attachBearerToken = (config) => {
+    const accessToken = getUserAccessToken();
+    if (accessToken) {
+        config.headers['Authorization'] = `Bearer ${accessToken}`;
+    }
+    return config;
+};
 
-const postPublicRequest = (url, data = {}) => {
-    return instance.post(url, data);
-}
+instance.interceptors.request.use(attachBearerToken, (error) => {
+    console.error("Request interceptor error", error);
+    return Promise.reject(error);
+});
 
+const makeRequest = (method, url, data = {}) => {
+    return instance({
+        method,
+        url,
+        data,
+    });
+};
 
-// Laravel Sanctum provides a route to retrieve the CSRF token
-// export const fetchCSRFToken = async () => {
-//     try {
-//         const response = await instance.get('/sanctum/csrf-cookie');
-//         console.log('response', response);
-//         return response;
-//     } catch (error) {
-//         console.error('Failed to fetch CSRF token', error);
-//         throw error;
-//     }
-// };
+const postRequest = (url, data) => makeRequest('post', url, data);
+const putRequest = (url, data) => makeRequest('put', url, data);
+const getRequest = (url) => makeRequest('get', url);
+const getPublicRequest = (url) => axios.get(url);
+const postPublicRequest = (url, data) => axios.post(url, data);
 
-// Add an interceptor to include CSRF token in the headers
-// instance.interceptors.request.use(
-//     async (config) => {
-//         try {
-//             const csrfToken = await fetchCSRFToken();  // Ensure CSRF token is fetched before making the request
-//             config.headers['X-XSRF-TOKEN'] = csrfToken;
-//         } catch (error) {
-//             console.error('Error setting CSRF token in request headers', error);
-//             return Promise.reject(error); // Reject the request in case of an error
-//         }
-//         return config;
-//     },
-//     (error) => {
-//         return Promise.reject(error);
-//     }
-// );
-
-export { postRequest, getRequest, postPublicRequest, getPublicRequest };
+export { postRequest, getRequest, putRequest, postPublicRequest, getPublicRequest, getUserAccessToken };
 
 export default instance;
+

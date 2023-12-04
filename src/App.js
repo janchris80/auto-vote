@@ -1,22 +1,21 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 
 import Layout from './layouts/Layout';
-import Missing from './components/Missing';
-import RequireAuth from './components/RequireAuth';
+import Missing from './components/common/Missing';
+import RequireAuth from './components/common/RequireAuth';
+import AuthorizedAccount from './components/common/AuthorizedAccount';
 import LoginPage from 'pages/LoginPage';
-import HomePage from 'pages/HomePage';
 import DashboardPage from 'pages/DashboardPage';
 import FanbasePage from 'pages/FanbasePage';
 import CurationTrailPage from 'pages/CurationTrailPage';
 import DownvoteTrailPage from 'pages/DownvoteTrailPage';
-import SchedulePostPage from 'pages/SchedulePostPage';
 import UpvoteCommentPage from 'pages/UpvoteCommentPage';
 import ClaimRewardPage from 'pages/ClaimRewardPage';
-import NotificationPage from 'pages/NotificationPage';
 import FaqPage from 'pages/FaqPage';
 import DonationPage from 'pages/DonationPage';
 import ContactUsPage from 'pages/ContactUsPage';
 import HelpVideoPage from 'pages/HelpVideoPage';
+import UserProfileWrapper from 'components/Profile/UserProfileWrapper';
 
 function App() {
 
@@ -32,16 +31,24 @@ function App() {
 
         {/* we want to protect these routes */}
         <Route element={<RequireAuth />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/home" element={<HomePage />} />
+          <Route index element={<Navigate to="/dashboard" replace />} />
           <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="/fanbase" element={<FanbasePage />} />
-          <Route path="/curation-trail" element={<CurationTrailPage />} />
-          <Route path="/downvote-trail" element={<DownvoteTrailPage />} />
-          <Route path="/schedule-posts" element={<SchedulePostPage />} />
-          <Route path="/upvote-comments" element={<UpvoteCommentPage />} />
-          <Route path="/claim-rewards" element={<ClaimRewardPage />} />
-          <Route path="/notifications" element={<NotificationPage />} />
+
+          {/* Check if you authorize the posting for this app */}
+          <Route element={<AuthorizedAccount />}>
+            <Route path="/fanbase" element={<FanbasePage />} />
+            <Route path="/fanbase/:username" element={<UserProfileWrapper />} />
+
+            <Route path="/curation-trail" element={<CurationTrailPage />} />
+            <Route path="/curation-trail/:username" element={<UserProfileWrapper />} />
+
+            <Route path="/downvote-trail" element={<DownvoteTrailPage />} />
+            <Route path="/downvote-trail/:username" element={<UserProfileWrapper />} />
+
+            <Route path="/upvote-comments" element={<UpvoteCommentPage />} />
+            <Route path="/claim-rewards" element={<ClaimRewardPage />} />
+          </Route>
+
         </Route>
 
         {/* catch all */}

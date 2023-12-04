@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Nav } from "react-bootstrap";
 import { routes } from '../../routes.js';
-import Link from './Link';
+import BrandIcon from 'components/common/BrandIcon.js';
 
 export default function Sidebar() {
   const location = useLocation();
@@ -11,12 +11,12 @@ export default function Sidebar() {
     <div className="sidebar" data-image='' data-color='white'>
       <div className="sidebar-wrapper">
         <div className="logo">
-          <NavLink
-            to='/'
+          <a
+            href='https://d.buzz/'
             className="simple-text font-weight-bold text-black"
           >
-            <span className='text-red'>Hive</span>Vote
-          </NavLink>
+            <BrandIcon />
+          </a>
         </div>
         <Nav>
           {routes.map(({ path, name, icon, upgrade }, index) => {
@@ -25,8 +25,12 @@ export default function Sidebar() {
               className={upgrade ? "active active-pro" : activeRoute(path)} >
               <NavLink
                 to={path}
-                className="nav-link text-black font-weight-light"
-                activeClass="active"
+                // className="nav-link text-black font-weight-light"
+                className={({ isActive }) =>
+                  isActive
+                    ? "nav-link text-black font-weight-light active"
+                    : "nav-link text-black font-weight-light"
+                }
               >
                 <i className={icon} />
                 <p>{name}</p>
