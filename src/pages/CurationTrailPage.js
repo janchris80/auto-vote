@@ -193,7 +193,7 @@ const CurationTrailPage = () => {
           <FollowingSetting
             type={type}
             show={showSettings}
-            onHide={handleCloseSetting}
+            handleCloseSetting={handleCloseSetting}
             trailer={trailer}
             refreshFollowingTrails={refreshFollowingTrails}
           />
@@ -285,11 +285,11 @@ const CurationTrailPage = () => {
                             </td>
                             <td>{followingTrailer.followersCount}</td>
                             <td>{followingTrailer.weight / 100}%</td>
-                            <td className='text-capitalize'>{followingTrailer.method}</td>
+                            <td className='text-capitalize'>{followingTrailer.votingType}</td>
                             {/* <td>{followingTrailer.waitTime}</td> */}
                             <td>
                               {
-                                followingTrailer.status
+                                followingTrailer.isEnable
                                   ? <Badge bg='success'>Enable</Badge>
                                   : <Badge bg='danger'>Disable</Badge>
                               }

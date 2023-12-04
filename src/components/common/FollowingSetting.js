@@ -5,7 +5,7 @@ import { Modal, Button } from 'react-bootstrap';
 import { useDispatch } from 'react-redux';
 import { updateFollowingTrail } from 'slices/trailer';
 
-const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails }) => {
+const FollowingSetting = ({ type, show, handleCloseSetting, trailer, refreshFollowingTrails }) => {
   const dispatch = useDispatch();
 
   const [id, setId] = useState('');
@@ -13,7 +13,7 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
   const [votingType, setVotingType] = useState('Scaled');
   const [weight, setWeight] = useState(100);
   const [afterMin, setAfterMin] = useState(0);
-  const [dailyLeft, setDailyLeft] = useState(1);
+  const [dailyLimit, setDailyLimit] = useState(1);
   const [limitLeft, setLimitLeft] = useState(1);
   const [username, setUsername] = useState('null')
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -26,15 +26,16 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
       setVotingType(trailer.votingType)
       setWeight(trailer.weight / 100)
       setAfterMin(trailer.afterMin)
-      setDailyLeft(trailer.dailyLeft)
+      setDailyLimit(trailer.dailyLimit)
       setLimitLeft(trailer.limitLeft)
+      console.log(trailer);
     }
   }, [trailer, show])
 
   const handleSubmit = (event) => {
     event.preventDefault();
     // Implement your submit logic here
-    // Use the state values id, isEnable, votingType, type, weight, afterMin, dailyLeft, limitLeft
+    // Use the state values id, isEnable, votingType, type, weight, afterMin, dailyLimit, limitLeft
     const cancelTokenSource = instance.createCancelToken();
     try {
       dispatch(updateFollowingTrail({
@@ -44,7 +45,7 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
         type,
         weight,
         afterMin,
-        dailyLeft,
+        dailyLimit,
         limitLeft,
         cancelToken: cancelTokenSource,
       }))
@@ -60,14 +61,15 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
 
   useEffect(() => {
     if (isSubmitted) {
-      onHide();
+      handleCloseSetting();
+      setIsSubmitted(false);
     }
   }, [isSubmitted])
 
   const toggleStatus = () => setIsEnable(!isEnable);
 
   return (
-    <Modal show={show} onHide={onHide}>
+    <Modal show={show} onHide={handleCloseSetting}>
       <Modal.Header closeButton>
         <Modal.Title>Settings: @{username}</Modal.Title>
       </Modal.Header>
@@ -97,11 +99,12 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
                 <select
                   className="form-control"
                   id="votingTypeSelect"
-                  value={votingType}
+                  required
                   onChange={(e) => setVotingType(e.target.value)}
                 >
-                  <option value="Scaled">Scaled</option>
-                  <option value="Fixed">Fixed</option>
+                  <option value='' >Select Method</option>
+                  <option value="Scaled" defaultValue={votingType === 'Scaled'}>Scaled</option>
+                  <option value="Fixed" defaultValue={votingType === 'Fixed'}>Fixed</option>
                 </select>
               </div>
             </>
@@ -143,17 +146,17 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
             type === 'fanbase' && <>
               {/* Daily Left Number Field */}
               <div className="form-group">
-                <label htmlFor="dailyLeftField">Daily Vote Limit</label>
+                <label htmlFor="dailyLimitField">Daily Vote Limit</label>
                 <input
                   type="number"
                   className="form-control"
-                  id="dailyLeftField"
+                  id="dailyLimitField"
                   min="1"
                   max="99"
                   step="1"
-                  value={dailyLeft}
-                  onChange={(e) => setDailyLeft(e.target.value)}
-                  name="dailyLeft"
+                  value={dailyLimit}
+                  onChange={(e) => setDailyLimit(e.target.value)}
+                  name="dailyLimit"
                 />
               </div>
 
@@ -182,7 +185,7 @@ const FollowingSetting = ({ type, show, onHide, trailer, refreshFollowingTrails 
         </form>
       </Modal.Body>
       <Modal.Footer style={{ borderTop: '0' }}>
-        <Button variant="default" onClick={onHide}>
+        <Button variant="default" onClick={handleCloseSetting}>
           Close
         </Button>
       </Modal.Footer>
