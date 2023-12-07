@@ -1,48 +1,65 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Container, Button, Row, Col, Card, Modal, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
 import SearchBar from 'components/Search/SearchBar';
 import instance from 'api/axios/instance';
-import FollowingSetting from 'components/common/FollowingSetting';
 import { updateTrailer } from 'slices/trailer';
-import { useFollowingTrails, useCreateTrailer, useGetTrailer } from 'hooks/useTrailer';
-import { DOWNVOTE } from 'lib/constant';
+import FollowingSetting from 'components/common/FollowingSetting';
+import { usePopularTrailers, useFollowingTrails, useCreateTrailer, useGetTrailer } from 'hooks/useTrailer';
 import followerService from 'api/services/followerService';
+import { CURATION } from 'lib/constant';
 import RenderPagination from 'components/common/RenderPagination';
+// import TrailerPopularTable from 'components/common/TrailerPopularTable';
 import TrailerFollowingTable from 'components/common/TrailerFollowingTable';
+import { useCallback } from 'react';
 
-const DownvoteTrailPage = () => {
+const CurationTrailPage = () => {
   const dispatch = useDispatch();
   const {
     followingTrailers,
     followingCurrentPage,
     followingTotalPages,
-    downvote,
+    popularTrailers,
+    // popularCurrentPage,
+    // popularTotalPages,
+    curation,
   } = useSelector((state) => state.trailer);
+  const { user } = useSelector((state) => state.auth);
 
   const userRef = useRef();
   const errRef = useRef();
   const prevFollowingTrailers = useRef(followingTrailers);
+  const prevPopularTrailers = useRef(popularTrailers);
 
   const [show, setShow] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [title, setTitle] = useState('Create Trail');
+  const [loadingFollow, setLoadingFollow] = useState(false);
   const [loadingStates, setLoadingStates] = useState({});
+  const [error, setError] = useState(null);
   const [description, setDescription] = useState('');
   const [id, setId] = useState('');
   const [validated, setValidated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [trailer, setTrailer] = useState(null);
+  // const [username, setUsername] = useState('');
 
-  const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(DOWNVOTE);
+  // const { popularPage, setPopularPage, refreshPopularTrails } = usePopularTrailers(CURATION);
+  const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(CURATION);
   const createTrailer = useCreateTrailer();
-  useGetTrailer(DOWNVOTE);
+  useGetTrailer(CURATION);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleCloseSetting = () => setShowSettings(false);
   const handleShowSetting = () => setShowSettings(true);
+
+  // useEffect(() => {
+  //   if (user) {
+  //     setUsername(user.username)
+  //   }
+  // }, [user])
 
   useEffect(() => {
     // Check if followingTrailers has changed
@@ -55,15 +72,25 @@ const DownvoteTrailPage = () => {
     prevFollowingTrailers.current = followingTrailers;
   }, [followingTrailers]);
 
+  // useEffect(() => {
+  //   // Check if followingTrailers has changed
+  //   if (prevPopularTrailers.current !== popularTrailers) {
+  //     console.log('popularTrailers has changed');
+  //     // Perform actions or call functions that you want to run when followingTrailers changes
+  //   }
+
+  //   // Update the ref with the current value
+  //   prevPopularTrailers.current = popularTrailers;
+  // }, [popularTrailers]);
 
   useEffect(() => {
-    if (downvote.id) {
-      console.log(downvote);
-      setDescription(downvote.description)
-      setId(downvote.id)
+    if (curation.id) {
+      console.log(curation);
+      setDescription(curation.description)
+      setId(curation.id)
       setTitle('Update Trail')
     }
-  }, [downvote])
+  }, [curation])
 
   const handlePageChange = (page, handlePage) => handlePage(page)
 
@@ -74,7 +101,7 @@ const DownvoteTrailPage = () => {
         [userId]: true,
       }));
 
-      await followerService.follow(userId, DOWNVOTE);
+      await followerService.follow(userId, CURATION);
       await refreshFollowingTrails();
       // await refreshPopularTrails();
     } catch (error) {
@@ -93,7 +120,7 @@ const DownvoteTrailPage = () => {
         ...prevLoadingStates,
         [userId]: true,
       }));
-      await followerService.unfollow(userId, DOWNVOTE);
+      await followerService.unfollow(userId, CURATION);
       await refreshFollowingTrails();
     } catch (error) {
       console.error(error);
@@ -112,15 +139,15 @@ const DownvoteTrailPage = () => {
 
   const handleCreate = (event) => {
     event.preventDefault();
-    // Get description and DOWNVOTE from form inputs or state
-    createTrailer(description, DOWNVOTE);
+    // Get description and CURATION from form inputs or state
+    createTrailer(description, CURATION);
   };
 
   const handleUpdate = async () => {
     // Handle form submission
     const cancelTokenSource = instance.createCancelToken();
     try {
-      await dispatch(updateTrailer({ description, DOWNVOTE, id, cancelToken: cancelTokenSource }))
+      await dispatch(updateTrailer({ description, CURATION, id, cancelToken: cancelTokenSource }))
     } catch (error) {
       setErrorMessage(error.message);
       console.error(error);
@@ -156,13 +183,12 @@ const DownvoteTrailPage = () => {
       <Row>
         <Col md="10">
           <SearchBar
-            trailerType={DOWNVOTE}
             handleFollow={handleFollow}
             handleUnfollow={handleUnfollow}
             loadingStates={loadingStates}
           />
           <FollowingSetting
-            trailerType={DOWNVOTE}
+            trailerType={CURATION}
             show={showSettings}
             handleCloseSetting={handleCloseSetting}
             trailer={trailer}
@@ -216,7 +242,7 @@ const DownvoteTrailPage = () => {
             </Card.Header>
             <Card.Body className="table-full-width table-responsive px-0">
               <TrailerFollowingTable
-                trailerType={DOWNVOTE}
+                trailerType={CURATION}
                 followingTrailers={followingTrailers}
                 loadingStates={loadingStates}
                 handleUnfollow={handleUnfollow}
@@ -235,8 +261,47 @@ const DownvoteTrailPage = () => {
           </Card>
         </Col>
       </Row>
+      {/* <Row>
+        <Col md="12">
+          <Card className="strpied-tabled-with-hover">
+            <Card.Header>
+              <Card.Title as="h4">Popular Curation Trails</Card.Title>
+              <p className="card-category">Here is a subtitle for this table</p>
+            </Card.Header>
+            <Card.Body className="table-full-width table-responsive px-0">
+              {loadingFollow ? (
+                <div style={{ textAlign: 'center', padding: '20px' }}>
+                  Loading...
+                </div>
+              ) : error ? (
+                <div style={{ color: 'red', textAlign: 'center' }}>
+                  Error: {error.message}
+                </div>
+              ) : (
+                <TrailerPopularTable
+                  username={username}
+                  trailerType={CURATION}
+                  popularTrailers={popularTrailers}
+                  loadingStates={loadingStates}
+                  handleFollow={handleFollow}
+                  handleUnfollow={handleUnfollow}
+                  popularCurrentPage={popularCurrentPage}
+                />
+              )}
+              <div className="d-flex justify-content-center mt-4">
+                <RenderPagination
+                  handlePageChange={handlePageChange}
+                  page={popularPage}
+                  setPage={setPopularPage}
+                  totalPage={popularTotalPages}
+                />
+              </div>
+            </Card.Body>
+          </Card>
+        </Col>
+      </Row> */}
     </Container>
   );
 };
 
-export default DownvoteTrailPage;
+export default CurationTrailPage;

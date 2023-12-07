@@ -21,7 +21,7 @@ const UpvoteCommentForm = ({ show, onHide, data }) => {
   const handleSubmit = (event) => {
     event.preventDefault();
     // Implement your submit logic here
-    // Use the state values id, status, method, type, weight, waitTime, dailyLimit, limitLeft
+    // Use the state values id, status, method, type, weight, waitTime
     const cancelTokenSource = instance.createCancelToken();
     try {
 

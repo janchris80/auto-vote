@@ -69,7 +69,7 @@ export default function DashboardPage() {
       try {
         dispatch(updateUser({
           isEnable: true,
-          type: 'is_enable',
+          requestType: 'is_enable',
         }))
         console.log('done');
       } catch (error) {
@@ -191,7 +191,7 @@ export default function DashboardPage() {
           limitPower: updateLimitUpvoteMana,
           isPause: isPause,
           isEnable: isEnable,
-          type: 'upvote',
+          requestType: 'upvote',
         }))
         setShowUpvoteForm(false);
       }
@@ -209,7 +209,7 @@ export default function DashboardPage() {
           limitPower: updateLimitDownvoteMana,
           isPause: isPause,
           isEnable: isEnable,
-          type: 'downvote',
+          requestType: 'downvote',
         }))
         setShowDownvoteForm(false);
       }

@@ -1,9 +1,9 @@
-import { postRequest, putRequest } from '../axios/instance';
+import { getRequest, postRequest, putRequest } from '../axios/instance';
 
 const trailerService = {
-  create: async (description, type, cancelToken) => {
+  create: async (description, trailerType, cancelToken) => {
     try {
-      const response = await postRequest(`/api/trailers`, { type, description }, { cancelToken: cancelToken.token });
+      const response = await postRequest(`/api/trailers`, { trailerType, description }, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {
       console.error('Error in trailer service creating trailer:', error);
@@ -11,9 +11,9 @@ const trailerService = {
     }
   },
 
-  update: async (description, type, id, cancelToken) => {
+  update: async (description, trailerType, id, cancelToken) => {
     try {
-      const response = await putRequest(`/api/trailers`, { type, description, id }, { cancelToken: cancelToken.token });
+      const response = await putRequest(`/api/trailers`, { trailerType, description, id }, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {
       console.error('Error in trailer service updating trailer:', error);
@@ -21,9 +21,9 @@ const trailerService = {
     }
   },
 
-  getTrailer: async (type, cancelToken) => {
+  getTrailer: async (trailerType, cancelToken) => {
     try {
-      const response = await postRequest(`/api/trailers/get`, { type }, { cancelToken: cancelToken.token });
+      const response = await postRequest(`/api/trailers/get`, { trailerType }, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {
       console.error('Error in trailer service getting trailer:', error);
@@ -31,9 +31,9 @@ const trailerService = {
     }
   },
 
-  getPopular: async (page, type, cancelToken) => {
+  getPopular: async (page, trailerType, cancelToken) => {
     try {
-      const response = await postRequest(`/api/popular?page=${page}`, { type }, { cancelToken: cancelToken.token });
+      const response = await getRequest(`/api/popular?page=${page}&type=${trailerType}`, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {
       console.error('Error in trailer service getting popular:', error);
@@ -41,27 +41,24 @@ const trailerService = {
     }
   },
 
-  getFollowing: async (page, type, cancelToken) => {
+  getFollowing: async (page, trailerType, cancelToken) => {
     try {
-      const response = await postRequest(`/api/following?page=${page}`, { type }, { cancelToken: cancelToken.token });
+      const response = await getRequest(`/api/following?page=${page}&type=${trailerType}`, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {
-      console.error('Error in trailer service getting popular:', error);
+      console.error('Error in trailer service getting follwing:', error);
       return error;
     }
   },
 
-  update: async (id, isEnable, votingType, type, weight, afterMin = 0, dailyLimit = 5, limitLeft = 5, cancelToken) => {
+  update: async (id, isEnable, votingType, trailerType, weight, cancelToken) => {
     try {
       const response = await putRequest(`/api/follower/update`, {
         id,
         isEnable,
         votingType,
-        type,
+        trailerType,
         weight,
-        afterMin,
-        dailyLimit,
-        limitLeft
       }, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {

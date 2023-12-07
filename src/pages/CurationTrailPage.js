@@ -1,15 +1,16 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Container, Button, Row, Col, Card, Table, Pagination, Modal, Form, Switch, Badge } from 'react-bootstrap';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Container, Button, Row, Col, Card, Modal, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
-import { Link } from 'react-router-dom';
 
 import SearchBar from 'components/Search/SearchBar';
 import instance from 'api/axios/instance';
-import { updateTrailer } from 'slices/trailer';
 import FollowingSetting from 'components/common/FollowingSetting';
-import { usePopularTrailers, useFollowingTrails, useCreateTrailer, useGetTrailer } from 'hooks/useTrailer';
+import { updateTrailer } from 'slices/trailer';
+import { useFollowingTrails, useCreateTrailer, useGetTrailer } from 'hooks/useTrailer';
+import { CURATION } from 'lib/constant';
 import followerService from 'api/services/followerService';
-
+import RenderPagination from 'components/common/RenderPagination';
+import TrailerFollowingTable from 'components/common/TrailerFollowingTable';
 
 const CurationTrailPage = () => {
   const dispatch = useDispatch();
@@ -17,47 +18,31 @@ const CurationTrailPage = () => {
     followingTrailers,
     followingCurrentPage,
     followingTotalPages,
-    popularTrailers,
-    popularCurrentPage,
-    popularTotalPages,
     curation,
   } = useSelector((state) => state.trailer);
-  const { user } = useSelector((state) => state.auth);
 
   const userRef = useRef();
   const errRef = useRef();
   const prevFollowingTrailers = useRef(followingTrailers);
-  const prevPopularTrailers = useRef(popularTrailers);
 
   const [show, setShow] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [title, setTitle] = useState('Create Trail');
-  const [loadingFollow, setLoadingFollow] = useState(false);
   const [loadingStates, setLoadingStates] = useState({});
-  const [error, setError] = useState(null);
   const [description, setDescription] = useState('');
   const [id, setId] = useState('');
-  const [type, setType] = useState('curation');
   const [validated, setValidated] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [trailer, setTrailer] = useState(null);
-  const [username, setUsername] = useState('');
 
-  const { popularPage, setPopularPage, refreshPopularTrails } = usePopularTrailers(type);
-  const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(type);
+  const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(CURATION);
   const createTrailer = useCreateTrailer();
-  useGetTrailer(type);
+  useGetTrailer(CURATION);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const handleCloseSetting = () => setShowSettings(false);
   const handleShowSetting = () => setShowSettings(true);
-
-  useEffect(() => {
-    if (user) {
-      setUsername(user.username)
-    }
-  }, [user])
 
   useEffect(() => {
     // Check if followingTrailers has changed
@@ -70,16 +55,6 @@ const CurationTrailPage = () => {
     prevFollowingTrailers.current = followingTrailers;
   }, [followingTrailers]);
 
-  useEffect(() => {
-    // Check if followingTrailers has changed
-    if (prevPopularTrailers.current !== popularTrailers) {
-      console.log('popularTrailers has changed');
-      // Perform actions or call functions that you want to run when followingTrailers changes
-    }
-
-    // Update the ref with the current value
-    prevPopularTrailers.current = popularTrailers;
-  }, [popularTrailers]);
 
   useEffect(() => {
     if (curation.id) {
@@ -99,9 +74,9 @@ const CurationTrailPage = () => {
         [userId]: true,
       }));
 
-      await followerService.follow(userId, type);
+      await followerService.follow(userId, CURATION);
       await refreshFollowingTrails();
-      await refreshPopularTrails();
+      // await refreshPopularTrails();
     } catch (error) {
       console.error(error);
     } finally {
@@ -112,16 +87,14 @@ const CurationTrailPage = () => {
     }
   };
 
-  const handleUnfollow = async (userId) => {
+  const handleUnfollow = useCallback(async (userId) => {
     try {
       setLoadingStates((prevLoadingStates) => ({
         ...prevLoadingStates,
         [userId]: true,
       }));
-
-      await followerService.unfollow(userId, type);
+      await followerService.unfollow(userId, CURATION);
       await refreshFollowingTrails();
-      await refreshPopularTrails();
     } catch (error) {
       console.error(error);
     } finally {
@@ -130,19 +103,24 @@ const CurationTrailPage = () => {
         [userId]: false,
       }));
     }
-  };
+  }, [followerService, refreshFollowingTrails, setLoadingStates]);
+
+  const handleSettings = useCallback((trailer) => {
+    setTrailer(trailer);
+    handleShowSetting();
+  }, [setTrailer, handleShowSetting]);
 
   const handleCreate = (event) => {
     event.preventDefault();
-    // Get description and type from form inputs or state
-    createTrailer(description, type);
+    // Get description and CURATION from form inputs or state
+    createTrailer(description, CURATION);
   };
 
   const handleUpdate = async () => {
     // Handle form submission
     const cancelTokenSource = instance.createCancelToken();
     try {
-      await dispatch(updateTrailer({ description, type, id, cancelToken: cancelTokenSource }))
+      await dispatch(updateTrailer({ description, CURATION, id, cancelToken: cancelTokenSource }))
     } catch (error) {
       setErrorMessage(error.message);
       console.error(error);
@@ -167,31 +145,24 @@ const CurationTrailPage = () => {
     handleClose();
   };
 
-
   useEffect(() => {
     if (show) {
       userRef.current.focus();
     }
   }, [show])
 
-
-  const handleSettings = (trailer) => {
-    setTrailer(trailer)
-    handleShowSetting()
-  }
-
   return (
     <Container fluid>
       <Row>
         <Col md="10">
           <SearchBar
-            type="curation"
+            trailerType={CURATION}
             handleFollow={handleFollow}
             handleUnfollow={handleUnfollow}
             loadingStates={loadingStates}
           />
           <FollowingSetting
-            type={type}
+            trailerType={CURATION}
             show={showSettings}
             handleCloseSetting={handleCloseSetting}
             trailer={trailer}
@@ -224,8 +195,6 @@ const CurationTrailPage = () => {
                   />
                 </Form.Group>
               </Form>
-
-
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={handleClose}>
@@ -243,193 +212,24 @@ const CurationTrailPage = () => {
           <Card className="strpied-tabled-with-hover">
             <Card.Header>
               <Card.Title as="h4">You are following</Card.Title>
-              <p className="card-category">{/* Here is a subtitle for this table */}</p>
+              <p className="card-category">List of trails you follow</p>
             </Card.Header>
             <Card.Body className="table-full-width table-responsive px-0">
-              {loadingFollow ? (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
-                  Loading...
-                </div>
-              ) : error ? (
-                <div style={{ color: 'red', textAlign: 'center' }}>
-                  Error: {error.message}
-                </div>
-              ) : (
-                <Table className="table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th className="border-0"></th>
-                      <th className="border-0">#</th>
-                      <th className="border-0">Username</th>
-                      <th className="border-0">Followers</th>
-                      <th className="border-0">Weight</th>
-                      <th className="border-0">Method</th>
-                      {/* <th className="border-0">Wait Time</th> */}
-                      <th className="border-0">Status</th>
-                      <th className="border-0">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {followingTrailers.length !== 0 ? (
-                      followingTrailers?.map((followingTrailer, index) => {
-                        return (
-                          <tr key={index}>
-                            <td>
-                              <input type="checkbox" />
-                            </td>
-                            <td>{index + 1 + (followingCurrentPage - 1) * 10}</td>
-                            <td>
-                              <Link to={`/curation-trail/@${followingTrailer.username}`}>
-                                @{followingTrailer.username}
-                              </Link>
-                            </td>
-                            <td>{followingTrailer.followersCount}</td>
-                            <td>{followingTrailer.weight / 100}%</td>
-                            <td className='text-capitalize'>{followingTrailer.votingType}</td>
-                            {/* <td>{followingTrailer.waitTime}</td> */}
-                            <td>
-                              {
-                                followingTrailer.isEnable
-                                  ? <Badge bg='success'>Enable</Badge>
-                                  : <Badge bg='danger'>Disable</Badge>
-                              }
-                            </td>
-                            <td className=''>
-                              {/* Show loading spinner when loadingFollow is true */}
-                              {loadingFollow ? (
-                                <Spinner size='sm' animation="border" role="status">
-                                  <span className="sr-only">Loading...</span>
-                                </Spinner>
-                              ) : (
-                                <>
-                                  <Button size="sm" onClick={() => handleSettings(followingTrailer)}>Settings</Button>
-                                  <Button
-                                    size="sm"
-                                    variant='danger'
-                                    onClick={() => handleUnfollow(followingTrailer.userId)} disabled={loadingFollow}
-                                  >
-                                    {loadingStates[followingTrailer.userId] ? 'Removing...' : 'Remove'}
-                                  </Button>
-                                </>
-                              )}
-                            </td>
-                          </tr>
-                        )
-                      })
-                    ) : (
-                      <tr>
-                        <td colSpan={9} style={{ textAlign: 'center' }}>
-                          None
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </Table>
-              )}
+              <TrailerFollowingTable
+                trailerType={CURATION}
+                followingTrailers={followingTrailers}
+                loadingStates={loadingStates}
+                handleUnfollow={handleUnfollow}
+                handleSettings={handleSettings}
+                followingCurrentPage={followingCurrentPage}
+              />
               <div className="d-flex justify-content-center mt-4">
-                <Pagination>
-                  <Pagination.First aria-label="First Page" onClick={() => handlePageChange(1, setFollowingPage)} />
-                  <Pagination.Prev
-                    aria-label="Prev Page"
-                    onClick={() => handlePageChange(followingPage === 1 ? followingPage : followingPage - 1, setFollowingPage)}
-                  />
-                  <Pagination.Item disabled>{`${followingPage} of ${followingTotalPages}`}</Pagination.Item>
-                  <Pagination.Next
-                    aria-label="Next Page"
-                    onClick={() =>
-                      handlePageChange(
-                        followingPage === followingTotalPages ? followingPage : followingPage + 1,
-                        setFollowingPage
-                      )
-                    }
-                  />
-                  <Pagination.Last aria-label="Last Page" onClick={() => handlePageChange(followingTotalPages, setFollowingPage)} />
-                </Pagination>
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-      <Row>
-        <Col md="12">
-          <Card className="strpied-tabled-with-hover">
-            <Card.Header>
-              <Card.Title as="h4">Popular Curation Trails</Card.Title>
-              <p className="card-category">{/* Here is a subtitle for this table */}</p>
-            </Card.Header>
-            <Card.Body className="table-full-width table-responsive px-0">
-              {loadingFollow ? (
-                <div style={{ textAlign: 'center', padding: '20px' }}>
-                  Loading...
-                </div>
-              ) : error ? (
-                <div style={{ color: 'red', textAlign: 'center' }}>
-                  Error: {error.message}
-                </div>
-              ) : (
-                <Table className="table-hover table-striped">
-                  <thead>
-                    <tr>
-                      <th className="border-0">#</th>
-                      <th className="border-0">Username</th>
-                      <th className="border-0">Description</th>
-                      <th className="border-0">Followers</th>
-                      <th className="border-0">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {popularTrailers.length !== 0 ? (
-                      popularTrailers.map((popularTrailer, index) => (
-                        <tr key={popularTrailer.id}>
-                          <td>{index + 1 + (popularCurrentPage - 1) * 10}</td>
-                          <td>
-                            <Link to={`/curation-trail/@${popularTrailer.username}`}>
-                              @{popularTrailer.username}
-                            </Link>
-                          </td>
-                          <td>{popularTrailer.description ?? 'None'}</td>
-                          <td>{popularTrailer.followersCount}</td>
-                          <td>
-                            {
-                              popularTrailer.username !== username
-                                ? popularTrailer.isFollowed
-                                  ? <Button size='sm' variant='danger' onClick={() => handleUnfollow(popularTrailer.userId)}>
-                                    {loadingStates[popularTrailer.userId] ? 'Unfollowing...' : 'Unfollow'}
-                                  </Button>
-                                  : <Button size='sm' variant='success' onClick={() => handleFollow(popularTrailer.userId)}>
-                                    {loadingStates[popularTrailer.userId] ? 'Following...' : 'Follow'}
-                                  </Button>
-                                : <Button size='sm' disabled variant='danger' className='text-black'>Cant follow yourself</Button>
-                            }
-                          </td>
-                        </tr>
-                      ))
-                    ) : (
-                      <tr>
-                        <td colSpan={5} style={{ textAlign: 'center' }}>
-                          No Users
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </Table>
-              )}
-              <div className="d-flex justify-content-center mt-4">
-                <Pagination>
-                  <Pagination.First aria-label="First Page" onClick={() => handlePageChange(1, setPopularPage)} />
-                  <Pagination.Prev
-                    aria-label="Prev Page"
-                    onClick={() => handlePageChange(popularPage === 1 ? popularPage : popularPage - 1, setPopularPage)}
-                  />
-                  <Pagination.Item disabled>{`${popularPage} of ${popularTotalPages}`}</Pagination.Item>
-                  <Pagination.Next
-                    aria-label="Next Page"
-                    onClick={() =>
-                      handlePageChange(popularPage === popularTotalPages ? popularPage : popularPage + 1, setPopularPage)
-                    }
-                  />
-                  <Pagination.Last aria-label="Last Page" onClick={() => handlePageChange(popularTotalPages, setPopularPage)} />
-                </Pagination>
+                <RenderPagination
+                  handlePageChange={handlePageChange}
+                  page={followingPage}
+                  setPage={setFollowingPage}
+                  totalPage={followingTotalPages}
+                />
               </div>
             </Card.Body>
           </Card>

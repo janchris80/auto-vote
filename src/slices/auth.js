@@ -44,9 +44,9 @@ const authSlice = createSlice({
 
 export const { loginSuccess, loginFailure, logoutSuccess, updateAuthorizeStatus, setAccessToken, updateUser } = authSlice.actions;
 
-export const update = ({ limitPower = 0, isPause = false, isEnable = false, type, isAutoClaimReward = false }) => async (dispatch) => {
+export const update = ({ limitPower, isPause, isEnable, requestType, isAutoClaimReward }) => async (dispatch) => {
   try {
-    const response = await authService.update(limitPower, isPause, isEnable, type, isAutoClaimReward);
+    const response = await authService.update(limitPower, isPause, isEnable, requestType, isAutoClaimReward);
 
     console.log(response);
     dispatch(updateUser({user: response}));

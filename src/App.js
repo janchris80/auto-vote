@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 import Layout from './layouts/Layout';
 import Missing from './components/common/Missing';
@@ -6,7 +7,7 @@ import RequireAuth from './components/common/RequireAuth';
 import AuthorizedAccount from './components/common/AuthorizedAccount';
 import LoginPage from 'pages/LoginPage';
 import DashboardPage from 'pages/DashboardPage';
-import FanbasePage from 'pages/FanbasePage';
+import UpvotePostPage from 'pages/UpvotePostPage';
 import CurationTrailPage from 'pages/CurationTrailPage';
 import DownvoteTrailPage from 'pages/DownvoteTrailPage';
 import UpvoteCommentPage from 'pages/UpvoteCommentPage';
@@ -17,7 +18,10 @@ import ContactUsPage from 'pages/ContactUsPage';
 import HelpVideoPage from 'pages/HelpVideoPage';
 import UserProfileWrapper from 'components/Profile/UserProfileWrapper';
 
-function App() {
+const App = () => {
+  useEffect(() => {
+    document.title = 'Auto.Vote';
+  }, []);
 
   return (
     <Routes>
@@ -36,8 +40,8 @@ function App() {
 
           {/* Check if you authorize the posting for this app */}
           <Route element={<AuthorizedAccount />}>
-            <Route path="/fanbase" element={<FanbasePage />} />
-            <Route path="/fanbase/:username" element={<UserProfileWrapper />} />
+            <Route path="/upvote-post" element={<UpvotePostPage />} />
+            <Route path="/upvote-post/:username" element={<UserProfileWrapper />} />
 
             <Route path="/curation-trail" element={<CurationTrailPage />} />
             <Route path="/curation-trail/:username" element={<UserProfileWrapper />} />
@@ -45,10 +49,9 @@ function App() {
             <Route path="/downvote-trail" element={<DownvoteTrailPage />} />
             <Route path="/downvote-trail/:username" element={<UserProfileWrapper />} />
 
-            <Route path="/upvote-comments" element={<UpvoteCommentPage />} />
-            <Route path="/claim-rewards" element={<ClaimRewardPage />} />
+            <Route path="/upvote-comment" element={<UpvoteCommentPage />} />
+            <Route path="/claim-reward" element={<ClaimRewardPage />} />
           </Route>
-
         </Route>
 
         {/* catch all */}

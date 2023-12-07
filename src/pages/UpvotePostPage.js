@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { useSelector } from 'react-redux';
 
-import { UPVOTE_COMMENT } from 'lib/constant';
+import { UPVOTE_POST } from 'lib/constant';
 import { useFollowingTrails } from 'hooks/useTrailer';
 
 import SearchBar from 'components/Search/SearchBar';
@@ -11,7 +11,7 @@ import followerService from 'api/services/followerService';
 import RenderPagination from 'components/common/RenderPagination';
 import TrailerFollowingTable from 'components/common/TrailerFollowingTable';
 
-const UpvoteCommentPage = () => {
+const UpvotePostPage = () => {
   const {
     followingTrailers,
     followingCurrentPage,
@@ -25,7 +25,7 @@ const UpvoteCommentPage = () => {
   const [loadingStates, setLoadingStates] = useState({});
   const [trailer, setTrailer] = useState(null);
 
-  const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(UPVOTE_COMMENT);
+  const { followingPage, setFollowingPage, refreshFollowingTrails } = useFollowingTrails(UPVOTE_POST);
 
   const handleCloseSetting = () => setShowSettings(false);
   const handleShowSetting = () => setShowSettings(true);
@@ -50,7 +50,7 @@ const UpvoteCommentPage = () => {
         [userId]: true,
       }));
 
-      await followerService.follow(userId, UPVOTE_COMMENT);
+      await followerService.follow(userId, UPVOTE_POST);
       await refreshFollowingTrails();
     } catch (error) {
       console.error(error);
@@ -62,14 +62,14 @@ const UpvoteCommentPage = () => {
     }
   };
 
-  const handleUnfollow = async (userId) => {
+  const handleUnfollow = useCallback(async (userId) => {
     try {
       setLoadingStates((prevLoadingStates) => ({
         ...prevLoadingStates,
         [userId]: true,
       }));
 
-      await followerService.unfollow(userId, UPVOTE_COMMENT);
+      await followerService.unfollow(userId, UPVOTE_POST);
       await refreshFollowingTrails();
     } catch (error) {
       console.error(error);
@@ -79,26 +79,25 @@ const UpvoteCommentPage = () => {
         [userId]: false,
       }));
     }
-  };
+  }, [followerService, refreshFollowingTrails, setLoadingStates]);
 
-
-  const handleSettings = (trailer) => {
-    setTrailer(trailer)
-    handleShowSetting()
-  }
+  const handleSettings = useCallback((trailer) => {
+    setTrailer(trailer);
+    handleShowSetting();
+  }, [setTrailer, handleShowSetting]);
 
   return (
     <Container fluid>
       <Row>
         <Col md="10">
           <SearchBar
-            trailerType={UPVOTE_COMMENT}
+            trailerType={UPVOTE_POST}
             handleFollow={handleFollow}
             handleUnfollow={handleUnfollow}
             loadingStates={loadingStates}
           />
           <FollowingSetting
-            trailerType={UPVOTE_COMMENT}
+            trailerType={UPVOTE_POST}
             show={showSettings}
             handleCloseSetting={handleCloseSetting}
             trailer={trailer}
@@ -110,12 +109,12 @@ const UpvoteCommentPage = () => {
         <Col>
           <Card className="strpied-tabled-with-hover">
             <Card.Header>
-              <Card.Title as="h4">Upvote comments you recieve from:</Card.Title>
-              <p className="card-category">If user commented on your post, the comment will be upvote.</p>
+              <Card.Title as="h4">Upvote posts from:</Card.Title>
+              <p className="card-category">List of author you want to upvote their post</p>
             </Card.Header>
             <Card.Body className="table-full-width table-responsive px-0">
               <TrailerFollowingTable
-                trailerType={UPVOTE_COMMENT}
+                trailerType={UPVOTE_POST}
                 followingTrailers={followingTrailers}
                 loadingStates={loadingStates}
                 handleUnfollow={handleUnfollow}
@@ -140,4 +139,4 @@ const UpvoteCommentPage = () => {
   );
 };
 
-export default UpvoteCommentPage;
+export default UpvotePostPage;

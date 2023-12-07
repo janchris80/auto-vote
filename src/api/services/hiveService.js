@@ -4,9 +4,9 @@ import hive from '@hiveio/hive-js';
 hive.api.setOptions({ url: 'https://api.hive.blog' });
 
 const hiveService = {
-  searchUsername: async (username) => {
+  searchUsername: async (username, trailerType) => {
     try {
-      const response = await postRequest(`/api/account/search`, { username })
+      const response = await postRequest(`/api/account/search`, { username, trailerType })
 
       return response;
     } catch (error) {

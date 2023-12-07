@@ -76,13 +76,13 @@ const authService = {
     }
   },
 
-  update: async (limitPower, isPause, isEnable, type, isAutoClaimReward) => {
+  update: async (limitPower, isPause, isEnable, requestType, isAutoClaimReward) => {
     try {
       const response = await postRequest(`/api/user/update`, {
         limitPower: limitPower,
         isPause: isPause,
         isEnable: isEnable,
-        type: type,
+        requestType: requestType,
         isAutoClaimReward: isAutoClaimReward,
       })
       let user = response?.data?.data;
