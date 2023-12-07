@@ -4,8 +4,9 @@ import axios from 'axios';
 import { useState } from 'react';
 import SearchResultModal from './SearchResultModal';
 import hiveService from 'api/services/hiveService';
+import { useEffect } from 'react';
 
-const SearchBar = ({ type, loadingStates, handleUnfollow, handleFollow }) => {
+const SearchBar = ({ loadingStates, handleUnfollow, handleFollow, trailerType }) => {
   const [searchUsername, setSearchUsername] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -16,12 +17,16 @@ const SearchBar = ({ type, loadingStates, handleUnfollow, handleFollow }) => {
       setLoading(true); // Set loading to true when starting the search
 
       try {
-        const result = await hiveService.searchUsername(searchUsername);
+        const result = await hiveService.searchUsername(searchUsername, trailerType);
         const user = result?.data?.data;
 
-        console.log(user);
-        setSearchResult(user);
-        setShowModal(true);
+        if (user?.hive_user.length !== 0) {
+          setSearchResult(user);
+          setShowModal(true);
+        } else {
+          window.alert('No User Found');
+        }
+
       } catch (error) {
         console.error('Error making the request:', error);
       } finally {
@@ -46,6 +51,7 @@ const SearchBar = ({ type, loadingStates, handleUnfollow, handleFollow }) => {
         <Form.Control
           style={{ height: '44px' }}
           placeholder="Find a @username"
+          maxLength={16}
           onChange={(e) => setSearchUsername(e.target.value)}
           onKeyDown={handleKeyDown}
         />
@@ -59,17 +65,14 @@ const SearchBar = ({ type, loadingStates, handleUnfollow, handleFollow }) => {
         </Button>
       </InputGroup>
 
-      {searchResult && (
-        <SearchResultModal
-          show={showModal}
-          type={type}
-          loadingStates={loadingStates}
-          handleUnfollow={handleUnfollow}
-          handleFollow={handleFollow}
-          handleClose={handleCloseModal}
-          user={searchResult}
-        />
-      )}
+      <SearchResultModal
+        show={showModal}
+        loadingStates={loadingStates}
+        handleUnfollow={handleUnfollow}
+        handleFollow={handleFollow}
+        handleClose={handleCloseModal}
+        user={searchResult}
+      />
     </div>
   );
 };

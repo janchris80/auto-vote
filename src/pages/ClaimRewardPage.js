@@ -14,7 +14,6 @@ const ClaimRewardPage = () => {
   const { user } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
-  const [claimReward, setClaimReward] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const [username, setUsername] = useState('');
@@ -29,34 +28,19 @@ const ClaimRewardPage = () => {
     }
   }, [user]);
 
-  useEffect(() => {
-    // You can also add your logic here for automatic updates or API calls
-  }, [claimReward]);
-
-  const handleEnable = () => {
-    // Add your logic to enable the reward
-    handleSubmit()
-  };
-
-  const handleDisable = () => {
-    // Add your logic to disable the reward
-    handleSubmit()
-  };
-
   const handleSubmit = () => {
     try {
-      setLoading(true)
+      setLoading(true);
       if (window.confirm('Are you sure?')) {
         dispatch(updateUser({
-          type: 'is_auto_claim_reward',
-          isAutoClaimReward: claimReward,
+          requestType: 'is_auto_claim_reward',
+          isAutoClaimReward: !isAutoClaimReward,
         }))
       }
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false)
-      setClaimReward(!claimReward)
     }
   }
 
@@ -89,11 +73,14 @@ const ClaimRewardPage = () => {
                 </Row>
                 <Row>
                   <Col>
-                    {isAutoClaimReward ? (
-                      <Button style={{ marginTop: '5px' }} disabled={loading} variant="danger" onClick={() => handleDisable()}>Click to Disable</Button>
-                    ) : (
-                      <Button style={{ marginTop: '5px' }} disabled={loading} variant="success" onClick={() => handleEnable()}>Click to Enable</Button>
-                    )}
+                    <Button
+                      style={{ marginTop: '5px' }}
+                      disabled={loading}
+                      variant={!isAutoClaimReward ? "success" : "danger"}
+                      onClick={() => handleSubmit()}
+                    >
+                      {loading ? 'Loading...' : (!isAutoClaimReward ? 'Click to Enable' : 'Click to Disable')}
+                    </Button>
                   </Col>
                 </Row>
               </Card.Body>

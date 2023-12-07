@@ -20,8 +20,8 @@ export default function DashboardPage() {
   const [authorizeAccount, setAuthorizeAccount] = useState('');
   const [upvotingStatus, setUpvotingStatus] = useState({});
   const [downvotingStatus, setDownvotingStatus] = useState({});
-  const [currentUpvoteMana, setCurrentUpvoteMana] = useState(null);
-  const [currentDownvoteMana, setCurrentDownvoteMana] = useState(null);
+  const [currentUpvoteMana, setCurrentUpvoteMana] = useState(100);
+  const [currentDownvoteMana, setCurrentDownvoteMana] = useState(100);
   const [showUpvoteForm, setShowUpvoteForm] = useState(false);
   const [showDownvoteForm, setShowDownvoteForm] = useState(false);
   const [updateLimitUpvoteMana, setUpdateLimitUpvoteMana] = useState(1);
@@ -69,7 +69,7 @@ export default function DashboardPage() {
       try {
         dispatch(updateUser({
           isEnable: true,
-          type: 'is_enable',
+          requestType: 'is_enable',
         }))
         console.log('done');
       } catch (error) {
@@ -169,7 +169,7 @@ export default function DashboardPage() {
     let currentMana = Number(mana) + (delta * maxMana / 432000)
     let percentage = Math.round(currentMana / maxMana * 10000)
     let percent = (Math.min(Math.max(percentage, 0), 10000) / 100).toFixed(2)
-    return percent;
+    return parseFloat(percent);
   }
 
   useEffect(() => {
@@ -191,7 +191,7 @@ export default function DashboardPage() {
           limitPower: updateLimitUpvoteMana,
           isPause: isPause,
           isEnable: isEnable,
-          type: 'upvote',
+          requestType: 'upvote',
         }))
         setShowUpvoteForm(false);
       }
@@ -209,7 +209,7 @@ export default function DashboardPage() {
           limitPower: updateLimitDownvoteMana,
           isPause: isPause,
           isEnable: isEnable,
-          type: 'downvote',
+          requestType: 'downvote',
         }))
         setShowDownvoteForm(false);
       }
@@ -353,7 +353,7 @@ export default function DashboardPage() {
                   <p>All your upvotes will be paused if your Mana is lower than the Mana limitation.</p>
                   <p>Read more about Mana in the Steemit FAQ.</p>
                   <p>
-                    You can check your Mana here: <a href={`https://hiveblocks.com/${username}`}>https://hiveblocks.com/{username}</a>
+                    You can check your Mana here: <a target='_blank' href={`https://hiveblocks.com/@${username}`}>https://hiveblocks.com/@{username}</a>
                   </p>
                 </Card.Body>
               </Card>

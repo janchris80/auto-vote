@@ -19,11 +19,6 @@ const initialState = {
     id: null,
     description: null,
   },
-
-  fanbase: {
-    id: null,
-    description: null,
-  },
 };
 
 const trailerSlice = createSlice({
@@ -51,15 +46,15 @@ const trailerSlice = createSlice({
       state.followingTotalPages = 1;
     },
     updateTrailerSuccess: (state, action) => {
-      if (state[action.payload.type]) {
-        state[action.payload.type].id = action.payload.id
-        state[action.payload.type].description = action.payload.description
+      if (state[action.payload.trailerType]) {
+        state[action.payload.trailerType].id = action.payload.id
+        state[action.payload.trailerType].description = action.payload.description
       }
     },
     updateTrailerFailure: (state, action) => {
-      if (state[action.payload.type]) {
-        state[action.payload.type].id = action.payload.id
-        state[action.payload.type].description = action.payload.description
+      if (state[action.payload.trailerType]) {
+        state[action.payload.trailerType].id = action.payload.id
+        state[action.payload.trailerType].description = action.payload.description
       }
     },
   },
@@ -74,11 +69,12 @@ export const {
   updateTrailerFailure,
 } = trailerSlice.actions;
 
-export const getPopular = ({ page, type, cancelToken }) => async (dispatch) => {
+export const getPopular = ({ page, trailerType, cancelToken }) => async (dispatch) => {
 
   try {
-    const { data } = await trailerService.getPopular(page, type, cancelToken);
+    const { data } = await trailerService.getPopular(page, trailerType, cancelToken);
 
+    dispatch(getFollowingFailure());
     dispatch(getPopularSuccess({
       popularTrailers: data.data,
       popularCurrentPage: data?.meta?.current_page,
@@ -96,11 +92,12 @@ export const getPopular = ({ page, type, cancelToken }) => async (dispatch) => {
   }
 };
 
-export const getFollowing = ({ page, type, cancelToken }) => async (dispatch) => {
+export const getFollowing = ({ page, trailerType, cancelToken }) => async (dispatch) => {
 
   try {
-    const { data } = await trailerService.getFollowing(page, type, cancelToken);
+    const { data } = await trailerService.getFollowing(page, trailerType, cancelToken);
 
+    dispatch(getPopularFailure());
     dispatch(getFollowingSuccess({
       followingTrailers: data.data,
       followingCurrentPage: data?.meta?.current_page,
@@ -118,15 +115,15 @@ export const getFollowing = ({ page, type, cancelToken }) => async (dispatch) =>
   }
 };
 
-export const createTrailer = ({ description, type, cancelToken }) => async (dispatch) => {
+export const createTrailer = ({ description, trailerType, cancelToken }) => async (dispatch) => {
 
   try {
-    const { data } = await trailerService.create(description, type, cancelToken);
+    const { data } = await trailerService.create(description, trailerType, cancelToken);
 
     dispatch(updateTrailerSuccess({
       id: data?.data?.id || null,
       description: data?.data?.description || null,
-      type: data?.data?.type || type,
+      trailerType: data?.data?.trailerType || trailerType,
     }));
   } catch (error) {
     const message =
@@ -140,15 +137,15 @@ export const createTrailer = ({ description, type, cancelToken }) => async (disp
   }
 };
 
-export const updateTrailer = ({ description, type, id, cancelToken }) => async (dispatch) => {
+export const updateTrailer = ({ description, trailerType, id, cancelToken }) => async (dispatch) => {
 
   try {
-    const { data } = await trailerService.update(description, type, id, cancelToken);
+    const { data } = await trailerService.update(description, trailerType, id, cancelToken);
 
     dispatch(updateTrailerSuccess({
       id: data?.data?.id || null,
       description: data?.data?.description || null,
-      type: data?.data?.type || type,
+      trailerType: data?.data?.trailerType || trailerType,
     }));
   } catch (error) {
     const message =
@@ -162,15 +159,15 @@ export const updateTrailer = ({ description, type, id, cancelToken }) => async (
   }
 };
 
-export const getTrailer = ({ type, cancelToken }) => async (dispatch) => {
+export const getTrailer = ({ trailerType, cancelToken }) => async (dispatch) => {
 
   try {
-    const { data } = await trailerService.getTrailer(type, cancelToken);
+    const { data } = await trailerService.getTrailer(trailerType, cancelToken);
 
     dispatch(updateTrailerSuccess({
       id: data?.data?.id || null,
       description: data?.data?.description || null,
-      type: data?.data?.type || type,
+      trailerType: data?.data?.trailerType || trailerType,
     }));
   } catch (error) {
     const message =
@@ -180,18 +177,13 @@ export const getTrailer = ({ type, cancelToken }) => async (dispatch) => {
       error.message ||
       error.toString();
     console.error(message);
-    dispatch(updateTrailerFailure({ type: type }));
+    dispatch(updateTrailerFailure({ trailerType: trailerType }));
   }
 };
 
-export const updateFollowingTrail = ({
-  id, isEnable, votingType, type, weight, afterMin, dailyLimit, limitLeft, cancelToken
-}) => async (dispatch) => {
-
+export const updateFollowingTrail = ({id, isEnable, votingType, trailerType, weight, cancelToken}) => async (dispatch) => {
   try {
-    const { data } = await trailerService.update(
-      id, isEnable, votingType, type, weight, afterMin, dailyLimit, limitLeft, cancelToken
-    );
+    const { data } = await trailerService.update(id, isEnable, votingType, trailerType, weight, cancelToken);
 
   } catch (error) {
     const message =
