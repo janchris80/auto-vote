@@ -353,7 +353,7 @@ export default function DashboardPage() {
                   <p>All your upvotes will be paused if your Mana is lower than the Mana limitation.</p>
                   <p>Read more about Mana in the Steemit FAQ.</p>
                   <p>
-                    You can check your Mana here: <a href={`https://hiveblocks.com/${username}`}>https://hiveblocks.com/{username}</a>
+                    You can check your Mana here: <a target='_blank' href={`https://hiveblocks.com/@${username}`}>https://hiveblocks.com/@{username}</a>
                   </p>
                 </Card.Body>
               </Card>
