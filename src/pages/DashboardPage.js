@@ -20,8 +20,8 @@ export default function DashboardPage() {
   const [authorizeAccount, setAuthorizeAccount] = useState('');
   const [upvotingStatus, setUpvotingStatus] = useState({});
   const [downvotingStatus, setDownvotingStatus] = useState({});
-  const [currentUpvoteMana, setCurrentUpvoteMana] = useState(null);
-  const [currentDownvoteMana, setCurrentDownvoteMana] = useState(null);
+  const [currentUpvoteMana, setCurrentUpvoteMana] = useState(100);
+  const [currentDownvoteMana, setCurrentDownvoteMana] = useState(100);
   const [showUpvoteForm, setShowUpvoteForm] = useState(false);
   const [showDownvoteForm, setShowDownvoteForm] = useState(false);
   const [updateLimitUpvoteMana, setUpdateLimitUpvoteMana] = useState(1);
@@ -169,7 +169,7 @@ export default function DashboardPage() {
     let currentMana = Number(mana) + (delta * maxMana / 432000)
     let percentage = Math.round(currentMana / maxMana * 10000)
     let percent = (Math.min(Math.max(percentage, 0), 10000) / 100).toFixed(2)
-    return percent;
+    return parseFloat(percent);
   }
 
   useEffect(() => {
