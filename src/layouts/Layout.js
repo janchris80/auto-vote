@@ -4,6 +4,9 @@ import Header from "components/Navbars/Header";
 import Footer from "components/Footer/Footer";
 import Sidebar from "components/Sidebar/Sidebar";
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const Layout = () => {
 
   const location = useLocation();
@@ -25,6 +28,7 @@ const Layout = () => {
 
   return (
     <div className="wrapper">
+      <ToastContainer />
       <Sidebar />
       <div className="main-panel main-context" ref={mainPanel}>
         <Header />

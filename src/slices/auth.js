@@ -87,6 +87,10 @@ export const addAccountAuthority = ({ username, authorizeAccount }) => async (di
     const response = await keychainService.requestAddAccountAuthority(username, authorizeAccount);
     if (response.success) {
       dispatch(updateAuthorizeStatus({ isEnable: true }));
+      dispatch(update({
+        isEnable: true,
+        requestType: 'is_enable',
+      }));
     }
   } catch (error) {
     const message =
@@ -104,6 +108,10 @@ export const removeAccountAuthority = ({ username, authorizeAccount }) => async 
     const response = await keychainService.requestRemoveAccountAuthority(username, authorizeAccount);
     if (response.success) {
       dispatch(updateAuthorizeStatus({ isEnable: false }));
+      dispatch(update({
+        isEnable: false,
+        requestType: 'is_enable',
+      }));
     }
   } catch (error) {
     const message =

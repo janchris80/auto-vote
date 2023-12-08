@@ -1,4 +1,5 @@
-import { useCallback } from 'react';
+import LogoutModal from 'components/modals/LogoutModal';
+import { useCallback, useState } from 'react';
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -7,6 +8,9 @@ import { logout } from 'slices/auth';
 function Header() {
   const { user, isLoggedIn } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
+
+  const [loading, setLoading] = useState(false);
+  const [openLogoutModal, setOpenLogoutModal] = useState(false)
 
   const mobileSidebarToggle = (e) => {
     e.preventDefault();
@@ -20,14 +24,31 @@ function Header() {
     document.body.appendChild(node);
   };
 
+  const hideLogoutModal = () => {
+    setOpenLogoutModal(false)
+  }
+
+  const showLogoutModal = () => {
+    setOpenLogoutModal(true)
+  }
+
   const handleLogout = useCallback(() => {
-    dispatch(logout());
+    try {
+      setLoading(true)
+      dispatch(logout());
+      hideLogoutModal();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false)
+    }
   }, [dispatch]);
 
 
   return (
     <Navbar bg="light" expand="lg">
       <Container fluid>
+        <LogoutModal show={openLogoutModal} onHide={hideLogoutModal} loading={loading} handleLogout={handleLogout} />
         <div className="d-flex justify-content-center align-items-center ml-2 ml-lg-0">
           <Button
             variant="dark"
@@ -85,15 +106,19 @@ function Header() {
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
-            {
-              isLoggedIn
-                ? (<Nav.Item>
-                  <Nav.Link as={Link} onClick={handleLogout} className="m-0">
-                    Logout ({user.username})
+            <Nav.Item>
+              {
+                isLoggedIn
+                  ?
+                  <Nav.Link as={Link} onClick={() => showLogoutModal()} className="m-0" disabled={loading}>
+                    {loading ? 'Logging out...' : `Logout (${user.username})`}
                   </Nav.Link>
-                </Nav.Item>)
-                : ''
-            }
+                  :
+                  <Nav.Link as={Link} to={'/login'} className="m-0">
+                    Login
+                  </Nav.Link>
+              }
+            </Nav.Item>
           </Nav>
         </Navbar.Collapse>
       </Container>

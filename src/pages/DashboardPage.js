@@ -125,8 +125,24 @@ export default function DashboardPage() {
             let totalvest = vesting + received - delegated - withdrawRate
             let maxMana = Number(totalvest * Math.pow(10, 6))
 
+            const currentPower = account.downvote_manabar.current_mana;
+            const lastUpdateTime = account.downvote_manabar.last_update_time;
+            const fullRechargeTime = 432000;
+
+            const now = new Date().getTime() / 1000;
+            const secondsSinceUpdate = now - lastUpdateTime;
+
+            let currentDownvotePower = (currentPower + secondsSinceUpdate * (maxMana / fullRechargeTime)) / maxMana;
+            currentDownvotePower = Math.min(currentDownvotePower, 1); // Cap at 100%
+            // Convert to percentage
+            const downvotePowerPercent = (currentDownvotePower * 100).toFixed(2);
+
+            console.log('currentDownvotePower', downvotePowerPercent);
+
+
             setCurrentUpvoteMana(calculatePercent(account.voting_manabar.current_mana, account.voting_manabar.last_update_time, maxMana));
-            setCurrentDownvoteMana(calculatePercent(account.downvote_manabar.current_mana, account.downvote_manabar.last_update_time, maxMana));
+            // setCurrentDownvoteMana(calculatePercent(account.downvote_manabar.current_mana, account.downvote_manabar.last_update_time, maxMana));
+            setCurrentDownvoteMana(parseFloat(downvotePowerPercent));
           }
         } catch (error) {
           console.error('Error making the request:', error);
@@ -138,7 +154,7 @@ export default function DashboardPage() {
       console.log("handleSettings()");
       handleSettings();
 
-      if (parseFloat(currentUpvoteMana) < parseFloat(limitUpvoteMana)) {
+      if (parseFloat(currentUpvoteMana) <= parseFloat(limitUpvoteMana)) {
         setUpvotingStatus({
           text: 'Paused',
           color: 'danger',
@@ -150,7 +166,7 @@ export default function DashboardPage() {
         });
       }
 
-      if (parseFloat(currentDownvoteMana) < parseFloat(limitDownvoteMana)) {
+      if (parseFloat(currentDownvoteMana) <= parseFloat(limitDownvoteMana)) {
         setDownvotingStatus({
           text: 'Paused',
           color: 'danger',
@@ -251,9 +267,9 @@ export default function DashboardPage() {
               <div className=''>
                 {isAuthorizeApp
                   ? <>
-                    <p>You can remove <strong>{authorizeAccount}</strong>'s access from your account by using Hive Keychain (extension/mobile) or you can click the button <strong>Unauthorize</strong>.</p>
+                    <p>You can remove <strong>@{authorizeAccount}</strong>'s access from your account by using Hive Keychain (extension/mobile) or you can click the button <strong>Unauthorize</strong>.</p>
                     <Button variant='danger' onClick={() => handleRemoveAuthority()}>
-                      Unauthorize (Leave {authorizeAccount})
+                      Unauthorize (Leave @{authorizeAccount})
                     </Button>
                   </>
                   : <>

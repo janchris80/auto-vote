@@ -1,7 +1,7 @@
 import { NavLink, useLocation } from "react-router-dom";
 import { Nav } from "react-bootstrap";
 import { routes } from '../../routes.js';
-import BrandIcon from 'components/common/BrandIcon.js';
+import BrandIcon from 'components/icon/BrandIcon';
 
 export default function Sidebar() {
   const location = useLocation();
