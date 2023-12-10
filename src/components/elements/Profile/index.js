@@ -34,7 +34,7 @@ const Profile = ({ account, followers }) => {
                     className="avatar border-gray"
                     src={jsonMetadata?.profile?.profile_image}
                   ></img>
-                  <h5 className="title">@{username}</h5>
+                  <h5 className="title">{username}</h5>
                 </a>
                 <p className="description">{jsonMetadata?.profile?.website}</p>
               </div>
