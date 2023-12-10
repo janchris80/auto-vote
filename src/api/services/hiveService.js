@@ -21,7 +21,47 @@ const hiveService = {
     } catch (error) {
       throw error;
     }
-  }
+  },
+
+  clearNotification: async (username) => {
+    try {
+      let date = new Date().toISOString();
+      date = date.replace('Z', '');
+
+      const json = JSON.stringify(["setLastRead", { date }])
+
+      const operation = [
+        [
+          'custom_json',
+          {
+            'required_auths': [],
+            'required_posting_auths': [username],
+            'id': 'notify',
+            json,
+          },
+        ],
+      ]
+
+      const response = window.hive_keychain.requestBroadcast(
+        username,
+        operation,
+        'Posting',
+        response => {
+          if (!response.success) {
+            return response.error.code
+          } else {
+            return response
+          }
+        },
+      )
+
+      console.log(result);
+
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
 };
 
 export default hiveService;

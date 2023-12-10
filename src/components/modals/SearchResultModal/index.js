@@ -14,6 +14,8 @@ const SearchResultModal = ({ show, handleClose, user, loadingStates, handleUnfol
       setHiveUser(user?.hive_user);
       setWebUser(user?.user);
       setUsername(`@${user?.hive_user?.name}`)
+
+      console.log(user);
     }
   }, [show, user])
 
@@ -37,11 +39,25 @@ const SearchResultModal = ({ show, handleClose, user, loadingStates, handleUnfol
         <Card>
           <Card.Header as="h3">{username}</Card.Header>
           <Card.Body>
-            <Card.Title className='mb-2'>
-            </Card.Title>
+            <Card.Title className='mb-2'>{hiveUser?.metadata?.profile?.about}</Card.Title>
             <Card.Subtitle className="mb-2 text-muted">
               Visit <a target='_blank' href={`https://d.buzz/${username}`}>{`d.buzz/${username}`}</a>
             </Card.Subtitle>
+            <Card.Text>
+              Follower: {hiveUser?.stats?.followers ?? 0}
+            </Card.Text>
+            <Card.Text>
+              Following: {hiveUser?.stats?.following ?? 0}
+            </Card.Text>
+            <Card.Text>
+              Rank: {hiveUser?.stats?.rank ?? 0}
+            </Card.Text>
+            <Card.Text>
+              Reputation: {hiveUser?.reputation}
+            </Card.Text>
+            <Card.Text>
+              Post Count: {hiveUser?.post_count}
+            </Card.Text>
           </Card.Body>
         </Card>
       </Modal.Body>

@@ -11,9 +11,7 @@ import {
 import { useParams } from 'react-router-dom';
 
 const Profile = ({ account, followers }) => {
-  const { username } = useParams();
-  const { json_metadata } = account?.hive_user
-  const jsonMetadata = JSON.parse(json_metadata);
+  const { metadata, name, stats, post_count, reputation } = account?.hive_user;
 
   return (
     <Container>
@@ -23,28 +21,45 @@ const Profile = ({ account, followers }) => {
             <div className="card-image">
               <img
                 alt="..."
-                src={jsonMetadata?.profile?.cover_image}
+                src={metadata?.profile?.cover_image}
               />
             </div>
             <Card.Body>
               <div className="author">
-                <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                <a href={`https://d.buzz/@${name}`} onClick={(e) => e.preventDefault()}>
                   <img
                     alt="..."
                     className="avatar border-gray"
-                    src={jsonMetadata?.profile?.profile_image}
+                    src={metadata?.profile?.profile_image}
                   ></img>
-                  <h5 className="title">{username}</h5>
+                  <h5 className="title">{metadata?.profile?.name}</h5>
                 </a>
-                <p className="description">{jsonMetadata?.profile?.website}</p>
+                <a href={metadata?.profile?.website} className="description">{metadata?.profile?.website}</a>
               </div>
               <p className="description text-center">
-                {jsonMetadata?.profile?.about}
+                {metadata?.profile?.about}
               </p>
             </Card.Body>
-            {/* <hr></hr>
-            <div className="button-container mr-auto ml-auto">
-              <Button
+            <hr></hr>
+            <div className="m-auto">
+              <Row>
+                <Col>
+                  <p>Followers: {stats?.followers ?? 0}</p>
+                </Col>
+                <Col>
+                  <p>Following: {stats?.following ?? 0}</p>
+                </Col>
+                <Col>
+                  <p>Rank: {stats?.rank ?? 0}</p>
+                </Col>
+                <Col>
+                  <p>Reputation: {reputation ?? 0}</p>
+                </Col>
+                <Col>
+                  <p>Post Count: {post_count ?? 0}</p>
+                </Col>
+              </Row>
+              {/* <Button
                 className="btn-simple btn-icon"
                 href="#pablo"
                 onClick={(e) => e.preventDefault()}
@@ -67,8 +82,8 @@ const Profile = ({ account, followers }) => {
                 variant="link"
               >
                 <i className="fab fa-google-plus-square"></i>
-              </Button>
-            </div> */}
+              </Button> */}
+            </div>
           </Card>
         </Col>
       </Row>
