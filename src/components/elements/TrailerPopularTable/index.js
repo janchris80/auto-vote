@@ -29,7 +29,7 @@ const TrailerPopularTable = ({
               <tr key={popularTrailer.id}>
                 <td>{index + 1 + (popularCurrentPage - 1) * 10}</td>
                 <td>
-                  <Link to={`/${trailerType}-trail/@${popularTrailer.username}`}>
+                  <Link to={`/@${popularTrailer.username}/${trailerType}`}>
                     @{popularTrailer.username}
                   </Link>
                 </td>

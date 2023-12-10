@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from "react-router-dom"
 import { useEffect, useRef } from "react";
-import Header from "components/Navbars/Header";
-import Footer from "components/Footer/Footer";
-import Sidebar from "components/Sidebar/Sidebar";
+import Navbars from "components/elements/Navbars";
+import Footer from "components/elements/Footer";
+import Sidebar from "components/elements/Sidebar";
 
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -31,7 +31,7 @@ const Layout = () => {
       <ToastContainer />
       <Sidebar />
       <div className="main-panel main-context" ref={mainPanel}>
-        <Header />
+        <Navbars />
         <div className="content">
           <Outlet />
         </div>

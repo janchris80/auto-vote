@@ -36,7 +36,7 @@ const TrailerFollowingUpvotePostTable = ({
                   </td>
                   <td>{index + 1 + (followingCurrentPage - 1) * 10}</td>
                   <td>
-                    <Link to={`/${trailerType}-trail/@${followingTrailer.username}`}>
+                    <Link to={`/@${followingTrailer.username}/${trailerType}`}>
                       @{followingTrailer.username}
                     </Link>
                   </td>

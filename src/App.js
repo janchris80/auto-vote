@@ -1,10 +1,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 
-import Layout from './layouts/Layout';
-import Missing from './components/common/Missing';
-import RequireAuth from './components/common/RequireAuth';
-import AuthorizedAccount from './components/common/AuthorizedAccount';
+import Layout from './layouts/DefaultLayout';
+import Missing from './components/elements/Missing';
+import RequireAuth from './components/wrappers/RequireAuth';
+import AuthorizedAccount from './components/wrappers/AuthorizedAccount';
 import LoginPage from 'pages/LoginPage';
 import DashboardPage from 'pages/DashboardPage';
 import UpvotePostPage from 'pages/UpvotePostPage';
@@ -16,7 +16,7 @@ import FaqPage from 'pages/FaqPage';
 import DonationPage from 'pages/DonationPage';
 import ContactUsPage from 'pages/ContactUsPage';
 import HelpVideoPage from 'pages/HelpVideoPage';
-import UserProfileWrapper from 'components/Profile/UserProfileWrapper';
+import UserProfileWrapper from 'components/wrappers/UserProfile';
 
 const App = () => {
   useEffect(() => {
@@ -41,13 +41,12 @@ const App = () => {
           {/* Check if you authorize the posting for this app */}
           <Route element={<AuthorizedAccount />}>
             <Route path="/upvote-post" element={<UpvotePostPage />} />
-            <Route path="/upvote-post/:username" element={<UserProfileWrapper />} />
 
             <Route path="/curation-trail" element={<CurationTrailPage />} />
-            <Route path="/curation-trail/:username" element={<UserProfileWrapper />} />
 
             <Route path="/downvote-trail" element={<DownvoteTrailPage />} />
-            <Route path="/downvote-trail/:username" element={<UserProfileWrapper />} />
+
+            <Route path="/:username/:trail" element={<UserProfileWrapper />} />
 
             <Route path="/upvote-comment" element={<UpvoteCommentPage />} />
             <Route path="/claim-reward" element={<ClaimRewardPage />} />

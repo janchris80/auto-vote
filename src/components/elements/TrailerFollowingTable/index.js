@@ -47,7 +47,7 @@ const TrailerFollowingTable = ({
                   </td>
                   <td>{index + 1 + (followingCurrentPage - 1) * DISPLAY_PAGE_NUMBER}</td>
                   <td>
-                    <Link to={`/${trailerType}-trail/@${followingTrailer.username}`}>
+                    <Link to={`/@${followingTrailer.username}/${trailerType}`}>
                       @{followingTrailer.username}
                     </Link>
                   </td>
