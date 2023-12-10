@@ -40,7 +40,8 @@ const Profile = ({ account, followers }) => {
                 {metadata?.profile?.about}
               </p>
             </Card.Body>
-            <hr></hr>
+            <hr />
+            <h5 className='text-center'>Hive Stats</h5>
             <div className="m-auto">
               <Row>
                 <Col>
