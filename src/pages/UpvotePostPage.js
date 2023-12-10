@@ -5,11 +5,11 @@ import { useSelector } from 'react-redux';
 import { UPVOTE_POST } from 'lib/constant';
 import { useFollowingTrails } from 'hooks/useTrailer';
 
-import SearchBar from 'components/Search/SearchBar';
-import FollowingSetting from 'components/common/FollowingSetting';
+import SearchBar from 'components/inputs/Search';
+import FollowingSetting from 'components/modals/FollowingSetting';
 import followerService from 'api/services/followerService';
-import RenderPagination from 'components/common/RenderPagination';
-import TrailerFollowingTable from 'components/common/TrailerFollowingTable';
+import RenderPagination from 'components/elements/RenderPagination';
+import TrailerFollowingTable from 'components/elements/TrailerFollowingTable';
 
 const UpvotePostPage = () => {
   const {

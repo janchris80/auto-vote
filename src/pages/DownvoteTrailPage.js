@@ -2,15 +2,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Container, Button, Row, Col, Card, Modal, Form } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 
-import SearchBar from 'components/Search/SearchBar';
+import SearchBar from 'components/inputs/Search';
 import instance from 'api/axios/instance';
-import FollowingSetting from 'components/common/FollowingSetting';
+import FollowingSetting from 'components/modals/FollowingSetting';
 import { updateTrailer } from 'slices/trailer';
 import { useFollowingTrails, useCreateTrailer, useGetTrailer } from 'hooks/useTrailer';
 import { DOWNVOTE } from 'lib/constant';
 import followerService from 'api/services/followerService';
-import RenderPagination from 'components/common/RenderPagination';
-import TrailerFollowingTable from 'components/common/TrailerFollowingTable';
+import RenderPagination from 'components/elements/RenderPagination';
+import TrailerFollowingTable from 'components/elements/TrailerFollowingTable';
 
 const DownvoteTrailPage = () => {
   const dispatch = useDispatch();

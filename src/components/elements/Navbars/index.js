@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logout } from 'slices/auth';
 
-function Header() {
+const Navbars = () => {
   const { user, isLoggedIn } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
 
@@ -126,4 +126,4 @@ function Header() {
   );
 }
 
-export default Header;
+export default Navbars;

@@ -2,11 +2,11 @@
 import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
 import axios from 'axios';
 import { useState } from 'react';
-import SearchResultModal from './SearchResultModal';
+import SearchResultModal from '../../modals/SearchResultModal';
 import hiveService from 'api/services/hiveService';
 import { useEffect } from 'react';
 
-const SearchBar = ({ loadingStates, handleUnfollow, handleFollow, trailerType }) => {
+const SearchInput = ({ loadingStates, handleUnfollow, handleFollow, trailerType }) => {
   const [searchUsername, setSearchUsername] = useState('');
   const [searchResult, setSearchResult] = useState(null);
   const [showModal, setShowModal] = useState(false);
@@ -46,7 +46,7 @@ const SearchBar = ({ loadingStates, handleUnfollow, handleFollow, trailerType })
   };
 
   return (
-    <div>
+    <>
       <InputGroup className="mb-3">
         <Form.Control
           style={{ height: '44px' }}
@@ -73,8 +73,8 @@ const SearchBar = ({ loadingStates, handleUnfollow, handleFollow, trailerType })
         handleClose={handleCloseModal}
         user={searchResult}
       />
-    </div>
+    </>
   );
 };
 
-export default SearchBar;
+export default SearchInput;

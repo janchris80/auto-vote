@@ -22,10 +22,23 @@ const followerService = {
       });
       return response;
     } catch (error) {
-      console.error('Error in follow service:', error);
-      throw Error('Failed to perform follow action');
+      console.error('Error in unfollow service:', error);
+      throw Error('Failed to perform unfollow action');
     }
   },
+
+  getFollowers: async(username, trailerType) => {
+    try {
+      const response = await postRequest(`/api/user/followers`, {
+        username: username,
+        trailerType: trailerType, // 'curation' or 'downvote'
+      });
+      return response;
+    } catch (error) {
+      console.error('Error in getFollowers service:', error);
+      throw Error('Failed to perform getFollowers action');
+    }
+  }
 };
 
 export default followerService;
