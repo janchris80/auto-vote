@@ -124,25 +124,30 @@ export default function DashboardPage() {
 
             let totalvest = vesting + received - delegated - withdrawRate
             let maxMana = Number(totalvest * Math.pow(10, 6))
+            const maxManaDown = maxMana * 0.25;
 
-            const currentPower = account.downvote_manabar.current_mana;
-            const lastUpdateTime = account.downvote_manabar.last_update_time;
-            const fullRechargeTime = 432000;
+            let delta = (Date.now() / 1000 - account.voting_manabar.last_update_time);
+            let currentMana = Number(account.voting_manabar.current_mana) + (delta * maxMana / 432000)
+            let percentage = Math.round(currentMana / maxMana * 10000)
+            let percent = (Math.min(Math.max(percentage, 0), 10000) / 100).toFixed(2)
 
-            const now = new Date().getTime() / 1000;
-            const secondsSinceUpdate = now - lastUpdateTime;
+            if (!isFinite(percentage)) percentage = 0;
+            if (percentage > 10000) percentage = 10000;
+            else if (percentage < 0) percentage = 0;
 
-            let currentDownvotePower = (currentPower + secondsSinceUpdate * (maxMana / fullRechargeTime)) / maxMana;
-            currentDownvotePower = Math.min(currentDownvotePower, 1); // Cap at 100%
-            // Convert to percentage
-            const downvotePowerPercent = (currentDownvotePower * 100).toFixed(2);
+            setCurrentUpvoteMana(percent);
 
-            console.log('currentDownvotePower', downvotePowerPercent);
+            let deltaDown = (Date.now() / 1000 - account.downvote_manabar.last_update_time);
+            let currentManaDown = Number(account.downvote_manabar.current_mana) + (deltaDown * maxManaDown / 432000)
+            let percentageDown = Math.round(currentManaDown / maxManaDown * 10000)
 
+            if (!isFinite(percentageDown)) percentageDown = 0;
+            if (percentageDown > 10000) percentageDown = 10000;
+            else if(percentageDown < 0) percentageDown = 0;
 
-            setCurrentUpvoteMana(calculatePercent(account.voting_manabar.current_mana, account.voting_manabar.last_update_time, maxMana));
-            // setCurrentDownvoteMana(calculatePercent(account.downvote_manabar.current_mana, account.downvote_manabar.last_update_time, maxMana));
-            setCurrentDownvoteMana(parseFloat(downvotePowerPercent));
+            let percentDown = (Math.min(Math.max(percentageDown, 0), 10000) / 100).toFixed(2)
+
+            setCurrentDownvoteMana(percentDown);
           }
         } catch (error) {
           console.error('Error making the request:', error);
@@ -179,14 +184,6 @@ export default function DashboardPage() {
       }
     }
   }, [isAuthorizeApp, account, limitUpvoteMana, currentUpvoteMana, limitDownvoteMana, currentDownvoteMana]);
-
-  const calculatePercent = (mana, lastUpdateTime, maxMana) => {
-    let delta = (Date.now() / 1000 - lastUpdateTime);
-    let currentMana = Number(mana) + (delta * maxMana / 432000)
-    let percentage = Math.round(currentMana / maxMana * 10000)
-    let percent = (Math.min(Math.max(percentage, 0), 10000) / 100).toFixed(2)
-    return parseFloat(percent);
-  }
 
   useEffect(() => {
     if (showUpvoteForm) {
