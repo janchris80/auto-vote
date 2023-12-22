@@ -16,12 +16,12 @@ export const routes = [
   },
   {
     path: '/upvote-post',
-    name: 'Upvote Post',
+    name: 'Upvote Posts',
     icon: 'pe-7s-like',
   },
   {
     path: '/upvote-comment',
-    name: 'Upvote Comment',
+    name: 'Upvote Comments',
     icon: 'pe-7s-comment',
   },
   {
