@@ -25,25 +25,24 @@ const authService = {
         username: username,
         message: LOGIN_REASON,
         method: POSTING_AUTHORITY,
-        title: "Auto Vote Login"
-      });
+        title: "Auto.Vote Login"
+      })
+        .then(async (response) => {
+          const { data } = await postRequest('/api/login', { username })
 
-      if (!hiveUser?.success) {
-        throw new Error('Something went wrong');
-      }
+          return {
+            ...data.data.user,
+            username,
+            accessToken: data.data.token,
+          };
+        })
+        .catch((error) => {
+          throw error;
+        });
 
-      const login = await axios.post(LOGIN_URL, { username })
+      console.log(hiveUser);
 
-      const accessToken = login?.data?.data?.token;
-
-      let data = {
-        username,
-        accessToken,
-        ...login?.data?.data?.user
-      };
-
-      return data;
-
+      return hiveUser;
     } catch (error) {
       throw error;
     }

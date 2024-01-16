@@ -25,6 +25,7 @@
     "react": "18.2.0",
     "react-app-rewired": "2.2.1",
     "react-bootstrap": "2.4.0",
+    "react-bootstrap-typeahead": "^6.3.2",
     "react-chartist": "0.14.4",
     "react-dom": "18.2.0",
     "react-notification-alert": "0.0.13",
@@ -40,7 +41,8 @@
     "redux-saga": "1.2.3",
     "redux-saga-thunk": "0.7.3",
     "sass": "1.53.0",
-    "stream-browserify": "3.0.0"
+    "stream-browserify": "3.0.0",
+    "typeahead.js": "^0.11.1"
   },
   "optionalDependencies": {
     "jquery": "3.5.1",

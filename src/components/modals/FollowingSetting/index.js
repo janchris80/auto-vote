@@ -2,17 +2,20 @@ import React, { useState, useMemo } from 'react';
 import instance from 'api/axios/instance';
 import { CURATION, DOWNVOTE } from 'lib/constant';
 import { useEffect } from 'react';
-import { Modal, Button } from 'react-bootstrap';
-import { useDispatch } from 'react-redux';
+import { Modal, Button, Row, Col } from 'react-bootstrap';
+import { useDispatch, useSelector } from 'react-redux';
 import { updateFollowingTrail } from 'slices/trailer';
+import SearchCommunity from 'components/inputs/SearchCommunity';
 
 const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refreshFollowingTrails }) => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
 
   const [id, setId] = useState('');
   const [isEnable, setIsEnable] = useState(false);
   const [votingType, setVotingType] = useState('Scaled');
   const [weight, setWeight] = useState(100);
+  const [voteTime, setVoteTime] = useState(0);
   const [username, setUsername] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false);
 
@@ -26,10 +29,30 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
       setUsername(trailer.username)
       setIsEnable(trailer.isEnable)
       setVotingType(trailer.votingType)
+      setVoteTime(trailer.votingTime)
       setWeight(trailer.weight / 100)
-      console.log(trailer);
+    }
+
+    if (!show) {
+      setId('');
+      setUsername('');
+      setIsEnable(false);
+      setVotingType('Scaled');
+      setWeight(100);
+      setVoteTime(0);
+      setIsSubmitted(false);
+      localStorage.removeItem(`excludedCommunities`);
+      refreshData();
     }
   }, [trailer, show])
+
+  const refreshData = async () => {
+    try {
+      await refreshFollowingTrails();
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -37,12 +60,15 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
     // Use the state values id, isEnable, votingType, trailerType, weight
     const cancelTokenSource = instance.createCancelToken();
     try {
+      const storedExcludedCommunities = localStorage.getItem(`excludedCommunities`);
       dispatch(updateFollowingTrail({
         id,
         isEnable,
         votingType,
         trailerType,
         weight,
+        communities: storedExcludedCommunities ? JSON.parse(storedExcludedCommunities) : [],
+        votingTime: voteTime,
         cancelToken: cancelTokenSource,
       }))
 
@@ -50,8 +76,6 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
     } catch (error) {
       setIsSubmitted(false)
       console.error(error);
-    } finally {
-      refreshFollowingTrails()
     }
   };
 
@@ -62,7 +86,11 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
     }
   }, [isSubmitted])
 
-  const toggleStatus = () => setIsEnable(!isEnable);
+  const capitalize = (word) => {
+    return word
+      .toLowerCase()
+      .replace(/\w/, firstLetter => firstLetter.toUpperCase());
+  }
 
   return (
     <Modal show={show} onHide={handleCloseSetting}>
@@ -97,10 +125,11 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
                   id="votingTypeSelect"
                   required
                   onChange={(e) => setVotingType(e.target.value)}
+                  defaultValue={capitalize(votingType)}
                 >
                   <option value='' >Select Method</option>
-                  <option value="Scaled" defaultValue={votingType === 'Scaled'}>Scaled</option>
-                  <option value="Fixed" defaultValue={votingType === 'Fixed'}>Fixed</option>
+                  <option value="Scaled">Scaled</option>
+                  <option value="Fixed">Fixed</option>
                 </select>
               </div>
             </>
@@ -113,24 +142,51 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
               type="number"
               className="form-control"
               id="weightSlider"
-              min="0"
-              max="100"
-              step="0.01"
+              min={0}
+              max={100}
+              step={0.01}
+              maxLength={3}
               value={weight}
-              onChange={(e) => setWeight(e.target.value)}
+              onChange={(e) => {
+                const inputValue = Math.min(parseFloat(e.target.value), 100); // Ensure the value is within the range
+                setWeight(inputValue);
+              }}
               name="weight"
+              required
             />
           </div>
 
-          {/* Submit Button */}
-          <Button variant="primary" type="submit">
-            Save Changes
-          </Button>
+          {/* votingTime Slider */}
+          <div className="form-group">
+            <label htmlFor="voteTime">Vote Delay Time (1440 minutes max)</label>
+            <input
+              type="number"
+              className="form-control"
+              id="voteTime"
+              min={0}
+              max={1440} // 1440 mins = 24 hours
+              step={1}
+              maxLength={4}
+              value={voteTime}
+              onChange={(e) => {
+                const inputValue = Math.min(parseInt(e.target.value, 10), 1440); // Ensure the value is within the range
+                setVoteTime(inputValue);
+              }}
+              name="voteTime"
+              required
+            />
+          </div>
+
+          <SearchCommunity username={username} trailerType={trailerType} trailer={trailer} />
+
         </form>
       </Modal.Body>
       <Modal.Footer style={{ borderTop: '0' }}>
         <Button variant="default" onClick={handleCloseSetting}>
           Close
+        </Button>
+        <Button variant="primary" type="button" onClick={handleSubmit}>
+          Save Changes
         </Button>
       </Modal.Footer>
     </Modal>

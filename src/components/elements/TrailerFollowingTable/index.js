@@ -33,6 +33,7 @@ const TrailerFollowingTable = ({
                 </>
                 : null
             }
+            <th className="border-0">Vote delay (minutes)</th>
             <th className="border-0">Status</th>
             <th className="border-0">Action</th>
           </tr>
@@ -60,6 +61,9 @@ const TrailerFollowingTable = ({
                       </>
                       : null
                   }
+                  <td>
+                    {followingTrailer.votingTime} min/s
+                  </td>
                   <td>
                     {
                       followingTrailer.isEnable

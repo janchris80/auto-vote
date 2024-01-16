@@ -159,29 +159,8 @@ export default function DashboardPage() {
       console.log("handleSettings()");
       handleSettings();
 
-      if (parseFloat(currentUpvoteMana) <= parseFloat(limitUpvoteMana)) {
-        setUpvotingStatus({
-          text: 'Paused',
-          color: 'danger',
-        });
-      } else {
-        setUpvotingStatus({
-          text: 'Normal',
-          color: 'success',
-        });
-      }
-
-      if (parseFloat(currentDownvoteMana) <= parseFloat(limitDownvoteMana)) {
-        setDownvotingStatus({
-          text: 'Paused',
-          color: 'danger',
-        });
-      } else {
-        setDownvotingStatus({
-          text: 'Normal',
-          color: 'success',
-        });
-      }
+      setVotingStatus(currentUpvoteMana, limitUpvoteMana, setUpvotingStatus);
+      setVotingStatus(currentDownvoteMana, limitDownvoteMana, setDownvotingStatus);
     }
   }, [isAuthorizeApp, account, limitUpvoteMana, currentUpvoteMana, limitDownvoteMana, currentDownvoteMana]);
 
@@ -213,6 +192,15 @@ export default function DashboardPage() {
     }
   };
 
+  const setVotingStatus = (currentMana, limitMana, setStatus) => {
+    const status = parseFloat(currentMana) <= parseFloat(limitMana) ? 'Paused' : 'Normal';
+    const color = status === 'Paused' ? 'danger' : 'success';
+
+    setStatus({
+      text: status,
+      color: color,
+    });
+  };
 
   const handleDownvoteFormSubmit = async (e) => {
     e.preventDefault();

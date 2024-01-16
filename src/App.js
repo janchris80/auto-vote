@@ -17,10 +17,50 @@ import DonationPage from 'pages/DonationPage';
 import ContactUsPage from 'pages/ContactUsPage';
 import HelpVideoPage from 'pages/HelpVideoPage';
 import UserProfileWrapper from 'components/wrappers/UserProfile';
+import hiveService from 'api/services/hiveService';
 
 const App = () => {
+
+  const fetchDataAndUpdateLocalStorage = async () => {
+    try {
+      let result = await hiveService.getListCommunities();
+    } catch (error) {
+      console.error('Error making the request:', error);
+    }
+  }
+
+  // Function to check if 12 hours have passed since the last fetch
+  const shouldFetchData = () => {
+    const lastFetchTimestamp = localStorage.getItem('lastFetchTimestamp');
+    if (!lastFetchTimestamp) {
+      // Fetch if no timestamp is found (first time)
+      return true;
+    }
+
+    const twelveHoursInMillis = 12 * 60 * 60 * 1000;
+    const elapsedMillis = Date.now() - parseInt(lastFetchTimestamp, 10);
+
+    return elapsedMillis >= twelveHoursInMillis;
+  };
+
+  // Effect to fetch data on component mount and schedule periodic checks
   useEffect(() => {
     document.title = 'Auto.Vote';
+
+    // Fetch data on component mount if 12 hours have passed since the last fetch
+    if (shouldFetchData()) {
+      fetchDataAndUpdateLocalStorage();
+    }
+
+    // Set up periodic check every minute
+    const intervalId = setInterval(() => {
+      if (shouldFetchData()) {
+        fetchDataAndUpdateLocalStorage();
+      }
+    }, 60000);
+
+    // Clear the interval when the component unmounts
+    return () => clearInterval(intervalId);
   }, []);
 
   return (

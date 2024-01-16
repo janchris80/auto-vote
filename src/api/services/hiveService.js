@@ -62,6 +62,35 @@ const hiveService = {
       throw error;
     }
   },
+
+  searchCommunities: async (query) => {
+    try {
+      const response = await hive
+        .api
+        .callAsync('bridge.list_communities', {
+          "query": query,
+          "limit": 100
+        });
+
+      return response;
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  getListCommunities: async (last = {}) => {
+    try {
+      const response = await getRequest('/api/communities');
+      const data = response?.data ?? [];
+
+      // Store data and last fetch timestamp in localStorage
+      localStorage.setItem('communityData', JSON.stringify(data));
+      localStorage.setItem('lastFetchTimestamp', Date.now());
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      throw error;
+    }
+  },
 };
 
 export default hiveService;

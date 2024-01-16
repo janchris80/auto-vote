@@ -51,7 +51,7 @@ const trailerService = {
     }
   },
 
-  update: async (id, isEnable, votingType, trailerType, weight, cancelToken) => {
+  update: async (id, isEnable, votingType, trailerType, weight, communities, votingTime, cancelToken) => {
     try {
       const response = await putRequest(`/api/follower/update`, {
         id,
@@ -59,6 +59,8 @@ const trailerService = {
         votingType,
         trailerType,
         weight,
+        votingTime,
+        communities,
       }, { cancelToken: cancelToken.token });
       return response;
     } catch (error) {

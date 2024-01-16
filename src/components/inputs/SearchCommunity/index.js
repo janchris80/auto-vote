@@ -1,8 +1,9 @@
 import { Form, Button, ListGroup, Row, Container, Col, Badge } from 'react-bootstrap';
 import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 
-export default function HelpVideoPage() {
-
+const SearchCommunity = ({ username, trailerType, trailer }) => {
+  const { user } = useSelector((state) => state.auth);
   const [communityData, setCommunityData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [excludedCommunities, setExcludedCommunities] = useState([]);
@@ -14,7 +15,7 @@ export default function HelpVideoPage() {
       setCommunityData(JSON.parse(storedData));
     }
 
-    const storedExcludedCommunities = localStorage.getItem('excludedCommunities');
+    const storedExcludedCommunities = localStorage.getItem(`excludedCommunities`);
     if (storedExcludedCommunities) {
       setExcludedCommunities(JSON.parse(storedExcludedCommunities));
     }
@@ -23,20 +24,32 @@ export default function HelpVideoPage() {
   // Effect to fetch data on component mount
   useEffect(() => {
     fetchDataFromLocalStorage();
-  }, []);
+
+    if (trailer) {
+      const excludedCommunity = trailer?.excludedCommunities[0];
+      if (excludedCommunity) {
+        updateLocalStorage(JSON.parse(excludedCommunity?.list));
+      }
+    }
+  }, [username]);
 
   // Function to handle adding/removing communities to/from the excluded list
   const handleToggleExcluded = (name) => {
     setExcludedCommunities((prevExcluded) => {
-      if (prevExcluded.includes(name)) {
-        // Remove from excluded list
-        return prevExcluded.filter((item) => item !== name);
-      } else {
-        // Add to excluded list
-        return [...prevExcluded, name];
-      }
+      const updatedExcluded = prevExcluded.includes(name)
+        ? prevExcluded.filter((item) => item !== name)
+        : [...prevExcluded, name];
+
+      // Save updated excludedCommunities to localStorage
+      updateLocalStorage(updatedExcluded);
+
+      return updatedExcluded;
     });
   };
+
+  const updateLocalStorage = (data) => {
+    localStorage.setItem(`excludedCommunities`, JSON.stringify(data));
+  }
 
   // Function to filter communities based on search term
   const filteredCommunities = communityData.filter(
@@ -55,6 +68,7 @@ export default function HelpVideoPage() {
           <ListGroup.Item key={community.name}>
             {community.name} - {community.title}{' '}
             <Button
+              size='sm'
               variant={excludedCommunities.includes(community.name) ? 'danger' : 'success'}
               onClick={() => handleToggleExcluded(community.name)}
             >
@@ -67,12 +81,12 @@ export default function HelpVideoPage() {
   };
 
   return (
-    <Container fluid>
+    <div>
       <Row>
         <Col>
+          Excluded Communities: {excludedCommunities.length === 0 ? <span>None</span> : ''}
           {excludedCommunities.length > 0 && (
             <ListGroup.Item>
-              Excluded Communities:{' '}
               {excludedCommunities.map((name) => (
                 <Badge
                   key={name}
@@ -89,6 +103,7 @@ export default function HelpVideoPage() {
               ))}
             </ListGroup.Item>
           )}
+
         </Col>
       </Row>
       <Row>
@@ -109,6 +124,8 @@ export default function HelpVideoPage() {
           {searchTerm.length >= 2 && renderCommunityList()}
         </Col>
       </Row>
-    </Container>
+    </div>
   );
 }
+
+export default SearchCommunity
