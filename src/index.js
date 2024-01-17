@@ -5,6 +5,7 @@ import { PersistGate } from "redux-persist/integration/react"; // Import Persist
 import { Provider } from 'react-redux';
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import 'react-bootstrap-typeahead/css/Typeahead.css';
 import "./assets/css/animate.min.css";
 import "./assets/scss/light-bootstrap-dashboard-react.scss?v=2.0.0";
 import "./assets/css/pe-icon-7-stroke.css";
