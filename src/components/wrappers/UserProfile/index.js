@@ -36,7 +36,6 @@ function UserProfileWrapper() {
       if (user?.hive_user.length !== 0) {
         setAccount(user);
         setUserExists(true);
-        console.log('user?.hive_user.length', user);
       } else {
         setUserExists(false);
       }
