@@ -101,7 +101,7 @@ const Navbars = () => {
                 <Dropdown.Item as={Link} to="/help-video">
                   Help Video
                 </Dropdown.Item>
-                <Dropdown.Item as={Link} to="/contact-us">
+                <Dropdown.Item as="a" href='https://chat.d.buzz/' target='__blank'>
                   Contact Us
                 </Dropdown.Item>
               </Dropdown.Menu>
