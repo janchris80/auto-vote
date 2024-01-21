@@ -25,9 +25,9 @@ const FollowerList = ({ followers }) => {
               : (
                 followers?.lenght !== 0
                   ? followers?.map((follower, index) =>
-                    <tr>
+                    <tr key={index}>
                       <td>{index + 1 + (currentPage - 1) * DISPLAY_PAGE_NUMBER}</td>
-                      <td><Link to={`@${follower.username}/${trail}`}>@{follower.username}</Link></td>
+                      <td><a href={`/@${follower.username}/${trail}`}>@{follower.username}</a></td>
                       <td>{follower.weight / 100}%</td>
                     </tr>
                   )

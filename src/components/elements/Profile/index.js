@@ -13,6 +13,24 @@ import { useParams } from 'react-router-dom';
 const Profile = ({ account, followers }) => {
   const { metadata, name, stats, post_count, reputation } = account?.hive_user;
 
+  const { trail } = useParams();
+  const [title, setTitle] = useState('');
+
+  useEffect(() => {
+    handleTrailTitle();
+  }, [trail]);
+
+  const handleTrailTitle = () => {
+    const trailTitles = {
+      curation: 'Curation Trail',
+      downvote: 'Downvote Trail',
+      upvote_comment: 'Upvote Comments',
+      upvote_post: 'Upvote Posts',
+    };
+
+    setTitle(trailTitles[trail] || '');
+  };
+
   return (
     <Container>
       <Row>
@@ -60,30 +78,6 @@ const Profile = ({ account, followers }) => {
                   <p>Post Count: {post_count ?? 0}</p>
                 </Col>
               </Row>
-              {/* <Button
-                className="btn-simple btn-icon"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-                variant="link"
-              >
-                <i className="fab fa-facebook-square"></i>
-              </Button>
-              <Button
-                className="btn-simple btn-icon"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-                variant="link"
-              >
-                <i className="fab fa-twitter"></i>
-              </Button>
-              <Button
-                className="btn-simple btn-icon"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-                variant="link"
-              >
-                <i className="fab fa-google-plus-square"></i>
-              </Button> */}
             </div>
           </Card>
         </Col>
@@ -91,6 +85,10 @@ const Profile = ({ account, followers }) => {
       <Row>
         <Col>
           <Card>
+            <Card.Header>
+              <Card.Title as="h4">Follower of {title}</Card.Title>
+              <p className="card-category">List of usernames</p>
+            </Card.Header>
             <Card.Body>
               <FollowerList followers={followers} />
             </Card.Body>
