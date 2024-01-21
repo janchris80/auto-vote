@@ -14,7 +14,7 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
   const [id, setId] = useState('');
   const [isEnable, setIsEnable] = useState(false);
   const [votingType, setVotingType] = useState('Scaled');
-  const [weight, setWeight] = useState(100);
+  const [weight, setWeight] = useState(50);
   const [voteTime, setVoteTime] = useState(0);
   const [username, setUsername] = useState('')
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -137,7 +137,7 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
 
           {/* Weight Slider */}
           <div className="form-group">
-            <label htmlFor="weightSlider">Weight (0% - 100%)</label>
+            <label htmlFor="weightSlider">Voting Weight (0% - 100%)</label>
             <input
               type="number"
               className="form-control"
