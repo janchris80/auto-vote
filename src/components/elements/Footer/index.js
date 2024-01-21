@@ -14,9 +14,9 @@ const Footer = () => {
               </Link>
             </li>
             <li>
-              <Link to={'/'} onClick={(e) => e.preventDefault()}>
+              <a href='https://chat.d.buzz/' target='__blank'>
                 Contact Us
-              </Link>
+              </a>
             </li>
             <li>
               <Link to={'/'} onClick={(e) => e.preventDefault()}>
