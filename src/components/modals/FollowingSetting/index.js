@@ -86,6 +86,7 @@ const FollowingSetting = ({ trailerType, show, handleCloseSetting, trailer, refr
     }
   }, [isSubmitted])
 
+  const toggleStatus = () => setIsEnable(!isEnable);
   const capitalize = (word) => {
     return word
       .toLowerCase()
